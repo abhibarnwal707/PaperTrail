@@ -158,15 +158,82 @@ Same split, same protocol (threshold on validation, test scored once). MLflow ru
 - Rules v2 test PR-AUC (0.0070) is slightly below v1 (0.0080). Report both and say the burst rule adds almost nothing. The one working rule is still the ACH band (1.96% precision, 50.5% recall).
 
 ### XGBoost v2: what changed
-- 51 features (16 tabular + 35 as-of history/graph). Same hyperparameters as v1; `scale_pos_weight` 1283.2, training stopped at iteration 118 (the exact `best_iteration` is in `phase4_metrics.json`).
-- PR-AUC rose from 0.046 to 0.351 (7.6×), F1 from 0.116 to 0.392, recall@1%FPR from 0.41 to 0.63, precision@1000 from 0.12 to 0.36. The last logged validation `aucpr` is 0.363 (exact validation PR-AUC is in `phase4_metrics.json`), close to test 0.351, so the gain is not a test-set fluke. Test has 956 positives, so small differences are still noise, but this gap is not.
+> **Correction after the ablation (section 5c):** 0.351 was the best of three seeds. The three-seed mean is 0.312 (std 0.034). Use 0.31 as the headline, and the explanation of *why* it works below was partly wrong.
+
+- 51 features (16 tabular + 35 as-of history/graph). Same hyperparameters as v1; `scale_pos_weight` 1283.2, `best_iteration` 68 (training stopped at 118).
+- PR-AUC rose from 0.046 to 0.351 (7.6×), F1 from 0.116 to 0.392, recall@1%FPR from 0.41 to 0.63, precision@1000 from 0.12 to 0.36. Validation PR-AUC is 0.369 (validation F1 0.421, recall@1%FPR 0.710), close to test 0.351, so the gain is not a test-set fluke. Test has 956 positives, so small differences are still noise, but this gap is not.
 - Top gain: `fmt_ACH` 0.40, `is_ach` 0.30 (the same information twice), `s_uniq_out` 0.10 (distinct counterparties the sender has paid so far), then `is_cross_currency`, `s_out_cnt_24h`, `s_gap_s` and `fmt_Cheque` at 1–2% each. Gain share is not the same as contribution: ACH still has most of the gain, but v1 had that too and scored 0.046. The history features let the model separate risky ACH transactions from ordinary ones.
 - The ACH-only slice also improves (PR-AUC 0.052 to 0.401), so the gain is not just from picking out ACH.
 
 ### Why I believe it, and what is still unchecked
 - Every feature is as-of (unit tests confirm that appending later rows never changes earlier rows), and train/val/test features are built the same way.
-- Not yet done: (1) an ablation (drop `s_uniq_out`, then drop all history features except it) to see which feature family carries the gain; (2) recall by typology, since fan-out accounts are likely what `s_uniq_out` finds; (3) a check that the effect is not an artefact of the synthetic generator, which is a caveat for the README anyway. PageRank was computed but I have not checked its importance or whether it helps (it is null on day 1; check `xgb_v2_importance.csv`).
+- The ablation (5c) has now been done. It shows the gain is real but noisy, and that it depends on the `totals_timing` family, not on `s_uniq_out`. A check that the effect is not an artefact of the synthetic generator is still open. PageRank was computed but I have not checked its importance or whether it helps (it is null on day 1). From `xgb_v2_importance.csv` its gain is small: `s_pagerank` 0.0038, `d_pagerank` 0.0035, `has_reverse_before` 0.0041, each well under 1%, so the graph features barely matter and the gain comes from the account-history features.
 - F1 of 0.39 is much better but still far from solved: at the validation-chosen threshold, precision and recall are both moderate.
+
+## 5c. Ablation (Phase 4b, `notebooks/03b-ablation.ipynb`)
+
+Question: where does the PR-AUC jump come from? 15 arms with identical parameters and protocol (threshold on validation, test scored once per arm), each logged to DagsHub as `abl_<arm>`. Raw numbers: `reports/ablation_table.csv`, `reports/ablation_metrics.json`, `reports/typology_recall.csv`. The 35 history features were grouped into four families: `windowed` (20: 24h/7d counts, sums, means), `uniq` (4: distinct counterparties so far), `totals_timing` (8: all-time counts, `gap_s` time since last event, `age_s` account age) and `graph` (3: `has_reverse_before`, two PageRanks).
+
+### 1. The headline number was the lucky seed
+| Full model (51 features) | seed 0 | seed 1 | seed 2 | mean ± std |
+|---|---|---|---|---|
+| Test PR-AUC | **0.351** | 0.295 | 0.291 | **0.312 ± 0.034** |
+| Validation PR-AUC | 0.369 | 0.330 | 0.321 | 0.340 |
+| best_iteration | 68 | 5 | 11 | |
+
+The earlier 0.351 is the best of the three. The honest figure is about **0.31, still roughly 7× the tabular 0.046**, but any difference smaller than about 0.05 between arms is noise. The best iteration also varies from 5 to 68: validation `aucpr` peaks within a handful of trees and then falls, so early stopping on a single noisy validation curve is unstable. All results in this report should be read with that in mind, and future headline numbers should be multi-seed means.
+
+### 2. Which features carry the gain
+| Arm | Test PR-AUC | Val PR-AUC | Reading |
+|---|---|---|---|
+| tabular only (16) | 0.046 | 0.049 | baseline |
+| tab + `totals_timing` | **0.223** | 0.260 | one family gets about 70% of the full mean |
+| tab + `uniq` | 0.137 | 0.168 | |
+| tab + `windowed` | 0.100 | 0.180 | |
+| tab + `graph` | 0.100 | 0.116 | doubles tabular, still small |
+| tab + `uniq_out` only (both sides) | 0.081 | 0.096 | |
+| full (3 seeds) | 0.312 mean | 0.340 | |
+| full − `graph` | 0.292 | 0.349 | within noise |
+| full − `uniq` | 0.318 | 0.340 | within noise (no loss at all) |
+| full − `windowed` | 0.278 | 0.293 | small, borderline |
+| full − `totals_timing` | **0.128** | 0.221 | collapses |
+| full − sender-side features | **0.133** | 0.152 | collapses |
+| full − receiver-side features | **0.178** | 0.234 | large drop |
+
+- **`s_uniq_out` is not what carries the model.** It had the highest gain among the new features, but removing the whole `uniq` family costs nothing beyond noise. Other features duplicate its information. Gain share misled me here, and the explanation in 5b ("fan-out") is not supported.
+- **The `totals_timing` family is the critical one**: all-time counts, `gap_s`, `age_s`. Removing it drops PR-AUC from 0.31 to 0.13. Alone, it gets 0.22.
+- **Both sides matter.** Removing the sender-side or receiver-side features each costs a lot, so the model uses the history of both accounts of the transaction.
+- **PageRank and the reciprocal flag add little**, as the importance list suggested.
+- Two arms (`tab+windowed`, `full-totals_timing`) ran to about 1,000 trees without early stopping and still scored lower, so training behaviour changes a lot with the feature set. This is another sign that the setup is not stable.
+
+### 3. A concern to resolve before calling this real
+`age_s` is "seconds since the account's first transaction **in this 18-day window**", and `gap_s`/`tot_*` also depend on where the window starts. Every account that exists on day 1 looks brand new, and ages can only reach about 6 days in train but about 10 days in test, so the feature's distribution shifts between splits. That may produce a signal that is partly a data-window artefact (accounts that appear only briefly, for example), partly real behaviour ("laundering accounts are newly active"). I have not tested this. Next experiment: ablate `age_s`, `gap_s`, `tot_out` and `tot_in` one at a time, compare their train and test distributions, and try a capped or relative age.
+
+### 4. Recall by typology (test positives, validation-chosen thresholds)
+| Typology | test positives | tabular | full | full − `uniq` | tab + `uniq` | full − `graph` | tab + `windowed` |
+|---|---|---|---|---|---|---|---|
+| UNMAPPED | **371 (38.8%)** | 0.01 | **0.00** | 0.00 | 0.01 | 0.00 | 0.05 |
+| GATHER-SCATTER | 127 | 0.30 | 0.49 | 0.58 | 0.39 | 0.43 | 0.23 |
+| SCATTER-GATHER | 110 | 0.26 | 0.41 | 0.51 | 0.20 | 0.45 | 0.42 |
+| STACK | 84 | 0.36 | 0.49 | 0.52 | 0.24 | 0.52 | 0.32 |
+| FAN-OUT | 65 | 0.28 | 0.37 | 0.45 | 0.25 | 0.37 | 0.26 |
+| FAN-IN | 57 | 0.33 | 0.53 | 0.58 | 0.32 | 0.51 | 0.25 |
+| CYCLE | 55 | 0.29 | **0.29** | 0.33 | 0.18 | 0.35 | 0.36 |
+| BIPARTITE | 44 | 0.30 | 0.41 | 0.52 | 0.16 | 0.43 | 0.23 |
+| RANDOM | 43 | 0.26 | 0.37 | 0.47 | 0.21 | 0.49 | 0.33 |
+
+- **The model is blind to the unmapped positives.** 371 of the 956 test positives (39%) have no typology in the patterns file, and no arm recalls more than about 5% of them. This is the biggest single gap and it caps what any model with these features can reach. Understanding what these transactions are (amounts, accounts, timing, format) is now the top open question.
+- **Mapped typologies** are recalled 0.3–0.6 by the full model, about 1.3–1.8× the tabular model. The weighted mean recall on mapped positives is about 0.43.
+- **FAN-OUT is not the strongest** (0.37), contrary to my expectation. FAN-IN and GATHER-SCATTER are best. This is another sign that the `s_uniq_out` fan-out story was wrong.
+- **CYCLE got no gain** from the history features (0.29 for full, same as tabular). This is the clearest case for the Phase 5 GNN to target.
+- Single arms differ by up to 0.1 on typologies with 40–130 positives, so per-typology numbers carry large noise. Use them for direction, not for ranking arms.
+
+### 5. What this means for the plan
+1. Report **0.31 ± 0.03 (3 seeds)** as the XGBoost v2 result, not 0.351.
+2. Before building on `totals_timing`, resolve the window-start concern in point 3.
+3. Stabilise training (lower learning rate, more seeds, and a few trees' worth of regularisation) so that comparisons with the GNN are fair. Compare the GNN to a multi-seed XGBoost mean.
+4. Investigate the 371 unmapped positives, because they cap recall.
+5. The GNN case: cycles and the unmapped positives. Do not promise more than that.
 
 ## 6. Open items
 
@@ -177,4 +244,8 @@ Same split, same protocol (threshold on validation, test scored once). MLflow ru
 - [ ] Check whether Saudi Riyal's lift survives within ACH only (cross-tab `pay_format × cur_paid`).
 - [ ] Look at why 1,968 positives have no typology (for example, compare their amounts, accounts and times to the mapped ones).
 - [ ] Log a corrected `rules_v2` (working send-count threshold) as a separate MLflow run.
-- [ ] Phase 4: as-of account features and graph features, then `xgb_v2_graph`.
+- [x] Phase 4: as-of account features and graph features, then `xgb_v2_graph` (section 5b).
+- [x] Phase 4b: ablation (section 5c).
+- [ ] Per-feature ablation inside `totals_timing` (`age_s`, `gap_s`, `tot_out`, `tot_in`) and a train/test distribution check of `age_s`.
+- [ ] Characterise the 371 unmapped test positives (the model recalls about none).
+- [ ] Stabilise XGBoost training and report multi-seed means.
