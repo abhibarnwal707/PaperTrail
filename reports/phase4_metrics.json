@@ -1,0 +1,103 @@
+{
+  "rules_v2": {
+    "threshold": 1.0868379686696814,
+    "val_pr_auc": 0.006961370317544478,
+    "val_f1": 0.025686720334296073,
+    "val_recall_at_1pct_fpr": 0.013513513513513514,
+    "val_precision_at_1000": 0.001,
+    "test_pr_auc": 0.006987899816197933,
+    "test_f1": 0.02480355959481208,
+    "test_recall_at_1pct_fpr": 0.013598326359832637,
+    "test_precision_at_1000": 0.0,
+    "test_ach_pr_auc": 0.019062429917608786,
+    "test_ach_f1": 0.049842987906728135,
+    "test_ach_recall_at_1pct_fpr": 0.011990407673860911,
+    "test_ach_precision_at_1000": 0.009
+  },
+  "xgb_v2_graph": {
+    "threshold": 0.966312825679779,
+    "val_pr_auc": 0.369039985072736,
+    "val_f1": 0.4206069160197601,
+    "val_recall_at_1pct_fpr": 0.7104247104247104,
+    "val_precision_at_1000": 0.373,
+    "test_pr_auc": 0.3511887428932415,
+    "test_f1": 0.3919442292796282,
+    "test_recall_at_1pct_fpr": 0.6286610878661087,
+    "test_precision_at_1000": 0.357,
+    "test_ach_pr_auc": 0.40124815242851947,
+    "test_ach_f1": 0.4328485885372113,
+    "test_ach_recall_at_1pct_fpr": 0.4784172661870504,
+    "test_ach_precision_at_1000": 0.357
+  },
+  "rule_params_v2": {
+    "amt_high": 15952734.67,
+    "burst": 5000.0
+  },
+  "burst_candidates": [
+    {
+      "burst": 5.0,
+      "flagged": 1063388,
+      "tp": 661,
+      "precision": 0.0006215981372744474,
+      "lift": 0.7982305303366936
+    },
+    {
+      "burst": 10.0,
+      "flagged": 550394,
+      "tp": 482,
+      "precision": 0.0008757362907299135,
+      "lift": 1.1245841997685855
+    },
+    {
+      "burst": 20.0,
+      "flagged": 303431,
+      "tp": 399,
+      "precision": 0.0013149612267698422,
+      "lift": 1.6886186339281828
+    },
+    {
+      "burst": 50.0,
+      "flagged": 269574,
+      "tp": 389,
+      "precision": 0.0014430175016878482,
+      "lift": 1.8530631875894013
+    },
+    {
+      "burst": 100.0,
+      "flagged": 268848,
+      "tp": 387,
+      "precision": 0.001439475093733262,
+      "lift": 1.8485141743110527
+    },
+    {
+      "burst": 200.0,
+      "flagged": 267334,
+      "tp": 386,
+      "precision": 0.0014438866735993177,
+      "lift": 1.8541793420857584
+    },
+    {
+      "burst": 500.0,
+      "flagged": 260122,
+      "tp": 373,
+      "precision": 0.0014339425346568148,
+      "lift": 1.8414094915572148
+    },
+    {
+      "burst": 1000.0,
+      "flagged": 234948,
+      "tp": 333,
+      "precision": 0.0014173348996373665,
+      "lift": 1.820082655914914
+    },
+    {
+      "burst": 5000.0,
+      "flagged": 147732,
+      "tp": 220,
+      "precision": 0.0014891831153710773,
+      "lift": 1.9123471527171998
+    }
+  ],
+  "scale_pos_weight": 1283.1584980237153,
+  "best_iteration": 68
+}

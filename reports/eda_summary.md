@@ -142,6 +142,32 @@ Validation PR-AUC for XGBoost is 0.0493, close to its test value of 0.0461, so t
 - Test has 956 positives, so differences of a few percent between models are within noise.
 - Numbers describe synthetic data.
 
+## 5b. Rules v2 and graph-feature results (Phase 4, `notebooks/03-graph-feats.ipynb`)
+
+Same split, same protocol (threshold on validation, test scored once). MLflow runs `rules_v2`, `xgb_v2_graph` and `xgb_v2_graph_shap` are on DagsHub. Feature building for all 5.08M rows took 46 s on Kaggle CPU.
+
+| Model | PR-AUC | F1 (minority) | Recall@1%FPR | Precision@1000 | ACH-only PR-AUC | ACH-only F1 |
+|---|---|---|---|---|---|---|
+| Rules (v1) | 0.0080 | 0.030 | 0.012 | 0.000 | 0.019 | 0.049 |
+| Rules v2 | 0.0070 | 0.025 | 0.014 | 0.000 | 0.019 | 0.050 |
+| XGB tabular (v1) | 0.0461 | 0.116 | 0.409 | 0.116 | 0.052 | 0.121 |
+| **XGB + history/graph (v2)** | **0.3512** | **0.392** | **0.629** | **0.357** | **0.401** | **0.433** |
+
+### Rules v2: the fix did not help
+- Training-set candidates for the send-count rule (`out_count_24h > N`): lift is 0.8 at N=5, 1.1 at N=10, about 1.85 for N from 50 to 1000, and 1.91 at N=5000. The best (N=5000) flags 59,986 validation rows at 0.13% precision, 7.6% recall. That is only about 1.2–1.9× the base rate, so the rule is alive but weak. Raw send volume is a poor signal by itself.
+- Rules v2 test PR-AUC (0.0070) is slightly below v1 (0.0080). Report both and say the burst rule adds almost nothing. The one working rule is still the ACH band (1.96% precision, 50.5% recall).
+
+### XGBoost v2: what changed
+- 51 features (16 tabular + 35 as-of history/graph). Same hyperparameters as v1; `scale_pos_weight` 1283.2, training stopped at iteration 118 (the exact `best_iteration` is in `phase4_metrics.json`).
+- PR-AUC rose from 0.046 to 0.351 (7.6×), F1 from 0.116 to 0.392, recall@1%FPR from 0.41 to 0.63, precision@1000 from 0.12 to 0.36. The last logged validation `aucpr` is 0.363 (exact validation PR-AUC is in `phase4_metrics.json`), close to test 0.351, so the gain is not a test-set fluke. Test has 956 positives, so small differences are still noise, but this gap is not.
+- Top gain: `fmt_ACH` 0.40, `is_ach` 0.30 (the same information twice), `s_uniq_out` 0.10 (distinct counterparties the sender has paid so far), then `is_cross_currency`, `s_out_cnt_24h`, `s_gap_s` and `fmt_Cheque` at 1–2% each. Gain share is not the same as contribution: ACH still has most of the gain, but v1 had that too and scored 0.046. The history features let the model separate risky ACH transactions from ordinary ones.
+- The ACH-only slice also improves (PR-AUC 0.052 to 0.401), so the gain is not just from picking out ACH.
+
+### Why I believe it, and what is still unchecked
+- Every feature is as-of (unit tests confirm that appending later rows never changes earlier rows), and train/val/test features are built the same way.
+- Not yet done: (1) an ablation (drop `s_uniq_out`, then drop all history features except it) to see which feature family carries the gain; (2) recall by typology, since fan-out accounts are likely what `s_uniq_out` finds; (3) a check that the effect is not an artefact of the synthetic generator, which is a caveat for the README anyway. PageRank was computed but I have not checked its importance or whether it helps (it is null on day 1; check `xgb_v2_importance.csv`).
+- F1 of 0.39 is much better but still far from solved: at the validation-chosen threshold, precision and recall are both moderate.
+
 ## 6. Open items
 
 - [x] Save the full daily table (`reports/daily.csv`).
