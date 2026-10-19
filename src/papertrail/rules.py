@@ -10,12 +10,49 @@ import polars as pl
 
 from papertrail.features import AMOUNT_BAND
 
+BURST_GRID = (5, 10, 20, 50, 100, 200, 500, 1000, 5000)
 
-def fit_rule_params(train: pl.DataFrame, q: float = 0.99) -> dict[str, float]:
+
+def fit_rule_params(train: pl.DataFrame, q: float = 0.99, burst: float | None = None) -> dict[str, float]:
+    """Rule thresholds from the training split. `burst` overrides the send-count threshold (rules_v2)."""
     return {
         "amt_high": float(train["amt_paid"].quantile(q)),
-        "burst": float(train["out_count_24h"].quantile(q)),
+        "burst": float(train["out_count_24h"].quantile(q)) if burst is None else float(burst),
     }
+
+
+def fit_burst_threshold(
+    train: pl.DataFrame, grid=BURST_GRID, min_flagged: int = 1000
+) -> tuple[float, pl.DataFrame]:
+    """Pick the send-count threshold N (rule: out_count_24h > N) from training data only.
+
+    The v1 threshold (99th percentile over all rows) was set by a handful of hub accounts and never fired.
+    Here we try a grid of N values and keep the one with the highest training precision lift
+    (precision / base rate) among those that flag at least `min_flagged` rows. Returns (N, table of candidates).
+    """
+    y = train["label"].to_numpy()
+    n24 = train["out_count_24h"].to_numpy()
+    base = float(y.mean())
+    rows = []
+    for n in grid:
+        fired = n24 > n
+        flagged = int(fired.sum())
+        tp = int((fired & (y == 1)).sum())
+        precision = tp / flagged if flagged else 0.0
+        rows.append({"burst": float(n), "flagged": flagged, "tp": tp,
+                     "precision": precision, "lift": precision / base if base else 0.0})
+    table = pl.DataFrame(rows)
+    ok = [r for r in rows if r["flagged"] >= min_flagged]
+    if not ok:
+        raise ValueError(f"no candidate threshold flags at least {min_flagged} training rows")
+    best = max(ok, key=lambda r: r["lift"])  # ties keep the smallest N
+    return best["burst"], table
+
+
+def fit_rule_params_v2(train: pl.DataFrame, q: float = 0.99) -> tuple[dict[str, float], pl.DataFrame]:
+    """rules_v2: same rules, with a send-count threshold that actually fires. Returns (params, candidates)."""
+    burst, table = fit_burst_threshold(train)
+    return fit_rule_params(train, q=q, burst=burst), table
 
 
 def rule_flags(df: pl.DataFrame, params: dict[str, float]) -> pl.DataFrame:

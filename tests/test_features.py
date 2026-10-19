@@ -93,3 +93,30 @@ def test_fit_rule_params_uses_given_frame_only():
     df = add_out_count_24h(_txns())
     p = fit_rule_params(df, q=1.0)
     assert p["amt_high"] == 40000.0
+
+
+def test_fit_burst_threshold_picks_best_lift_with_enough_support():
+    from papertrail.rules import fit_burst_threshold
+
+    # 2000 quiet rows, 1500 rows with 30 sends (10% laundering), 1200 rows with 600 sends (1% laundering)
+    label = [0] * 2000 + [1] * 150 + [0] * 1350 + [1] * 12 + [0] * 1188
+    n24 = [0] * 2000 + [30] * 1500 + [600] * 1200
+    train = pl.DataFrame({"label": label, "out_count_24h": n24})
+    n, table = fit_burst_threshold(train, grid=(5, 10, 50, 100, 1000), min_flagged=1000)
+    assert n == 5                                  # flags 2700 rows at the highest lift; ties keep the smallest N
+    row = table.filter(pl.col("burst") == 5).to_dicts()[0]
+    assert row["flagged"] == 2700 and row["tp"] == 162
+    assert table.filter(pl.col("burst") == 1000)["flagged"][0] == 0   # a dead threshold, never chosen
+
+
+def test_fit_burst_threshold_needs_support():
+    from papertrail.rules import fit_burst_threshold
+
+    train = pl.DataFrame({"label": [0, 1] * 10, "out_count_24h": list(range(20))})
+    with pytest.raises(ValueError):
+        fit_burst_threshold(train, min_flagged=1000)
+
+
+def test_fit_rule_params_burst_override():
+    df = add_out_count_24h(_txns())
+    assert fit_rule_params(df, burst=42)["burst"] == 42.0

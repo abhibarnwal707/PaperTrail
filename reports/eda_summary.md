@@ -49,6 +49,8 @@ Most currencies have a rate near the base (Euro 0.117%, US Dollar 0.101%, Yen 0.
 ### F5. Amounts: laundering sits in a narrow mid-to-high band
 On a log10 scale, laundering transactions peak sharply around **10^3.5–10^4.5 (about $3K–$30K)**, with a tight spike near 10^4. Normal transactions are broader and lower, peaking around 10^2–10^3.5. Only normal transactions have a mass of **near-zero amounts**. Both classes share a long right tail up to about 10^12. The distributions overlap heavily, so amount is a useful feature but a "high amount" rule alone will have poor precision.
 
+Training-window laundering amounts (Phase 3 check): 5% = 172, 25% = 2,224, median = 7,033, 75% = 18,666, 90% = 137,550, 95% = 782,357. The 3K–30K band therefore holds roughly **half** of the laundering transactions: it is a peak with a long right tail, not a band that contains most of them.
+
 ### F6. Self-transfers and cross-currency transactions are almost never laundering
 - Self-transfers (`src == dst`): 591,212 rows (11.6%), laundering rate 0.0019%, so only about 11 positives.
 - Cross-currency (`cur_paid != cur_recv`): 72,170 rows (1.4%), **zero** positives.
@@ -98,7 +100,7 @@ Across the 370 attempts, the span from first to last transaction has a median of
 | Area | Change |
 |---|---|
 | Split | Day-aligned, trimmed at Sep 10 (train Sep 1–6, val Sep 7–8, test Sep 9–10; see section 3). |
-| Rule baseline | Use ACH, a 3K–30K amount band, and high 24h send count. Exclude self-transfers, Wire and Reinvestment. Drop the cross-currency rule. |
+| Rule baseline | Use ACH, a 3K–30K amount band, and high 24h send count. Exclude self-transfers, Wire and Reinvestment. Drop the cross-currency rule. (Phase 3 result: the send-count rule never fired, see section 5.) |
 | Features | Add `is_ach`, an amount-band flag, `is_self_transfer` and `is_cross_currency`. Drop weekday and date. |
 | Imbalance | `scale_pos_weight` / `pos_weight` ≈ neg/pos on the train window (about 1,280 on the train split). |
 | Graph features | Log-transform degrees. Hub = top 1% (≥ 119). Cap cycle counts because of super hubs. |
@@ -110,11 +112,43 @@ Across the 370 attempts, the span from first to last transaction has a median of
 - The data is synthetic (IBM AMLworld generator). Findings such as "ACH is risky" or "cross-currency is safe" describe the generator, not real banks.
 - The Sep 11–18 laundering tail is a data-generation artifact. Say how it was handled and why.
 
-## 5. Open items
+## 5. Baseline results (Phase 3, `notebooks/02_baseline.ipynb`)
+
+Both models use the fixed split in `reports/split.md`, pick their threshold on validation, and score the test split once (test = 862,792 rows, 956 positives, base rate 0.111%). MLflow runs `rules_baseline` and `xgb_v1_tabular` are on DagsHub. Raw numbers: `reports/baseline_table.csv`, `reports/baseline_metrics.json`, `reports/xgb_v1_importance.csv`.
+
+| Model | PR-AUC | F1 (minority) | Recall@1%FPR | Precision@1000 | ACH-only PR-AUC | ACH-only F1 |
+|---|---|---|---|---|---|---|
+| Rules | 0.0080 | 0.030 | 0.012 | 0.000 | 0.019 | 0.049 |
+| XGB tabular (v1) | **0.0461** | **0.116** | **0.409** | **0.116** | 0.052 | 0.121 |
+
+Validation PR-AUC for XGBoost is 0.0493, close to its test value of 0.0461, so the model is not overfitting.
+
+### How to read the numbers
+- **Random guessing** gives PR-AUC equal to the base rate (0.0011) and F1 of about 0.002. XGBoost v1 is about 42× the base rate in PR-AUC and about 50× in F1. The rules are about 7× the base rate in PR-AUC.
+- **Recall@1%FPR = 0.409:** flagging the 1% highest-scored normal transactions (about 8,600 rows) catches about 391 of the 956 laundering transactions. This is the most useful headline number for a bank, because it fixes the false-alarm budget.
+- **Precision@1000 = 0.116:** about 116 of the 1,000 highest-scored test transactions are laundering.
+- **F1 = 0.116 is low in absolute terms.** At a 0.1% base rate, F1 is a harsh metric: it needs precision and recall to be high at the same time. This is a baseline with no account history and no graph structure, so a low F1 is expected and is the gap Phases 4–5 are meant to close. Do not describe it as good performance in the README.
+
+### What the baselines show
+1. **ACH dominates XGBoost.** `is_ach` and `fmt_ACH` (the same information, twice) carry about 80% of the total gain (0.457 + 0.346). Other features each add 0.4–2.7%, including `log_amt` (1.2%) and `in_amount_band` (1.4%). The v1 model has mostly learned "ACH transactions are riskier".
+2. **Only one rule works.** The ACH-and-3K–30K rule flagged 26,685 validation rows at 1.96% precision (about 18× the base rate) with 50.5% recall.
+3. **The amount rule is nearly useless.** Its threshold, the training 99th percentile, is 15,952,735 because amounts are extremely heavy-tailed. It flagged 7,020 validation rows at 0.19% precision with 1.3% recall.
+4. **The send-count rule never fired.** Its threshold was the 99th percentile of the 24-hour send count over all training rows, which came out at 19,445. A few hub accounts send tens of thousands of transactions per day and dominate that distribution, so no validation transaction exceeded it (0 rows flagged). The rule contributed nothing, and the "Rules" row above is effectively one rule plus the amount rule. A corrected threshold is planned as a separate run (`rules_v2`) so that the original result stays on record.
+5. **The rules' alert threshold is mostly an amount cut.** The validation-chosen threshold is 1.085. Since the score is the number of rules plus `log1p(amount)/100`, this means "ACH band rule fired and amount ≥ about $5,060", or the amount rule fired.
+6. **Rules' precision@1000 is 0.** Ties are broken by amount, so the 1,000 highest-scored rows are the very large amounts flagged by the amount rule, which are almost never laundering.
+
+### Caveats
+- The rule thresholds were fitted on training data only, but the first run of the rules was seen on test. The corrected version will be reported as a second run, not swapped in silently.
+- Test has 956 positives, so differences of a few percent between models are within noise.
+- Numbers describe synthetic data.
+
+## 6. Open items
 
 - [x] Save the full daily table (`reports/daily.csv`).
 - [x] Step 1.3: parse the patterns file and map typologies (`reports/typology_counts.csv`).
-- [ ] Step 1.4: confirm the Kaggle Dataset `papertrail-processed` is published (`transactions.parquet` 161 MB, `patterns.parquet` 70 KB).
+- [x] Step 1.4: Kaggle Dataset `papertrail-processed` is published and loads in the baseline notebook.
 - [ ] Confirm that most hour-0 rows are day-1 `Reinvestment` self-transfers.
 - [ ] Check whether Saudi Riyal's lift survives within ACH only (cross-tab `pay_format × cur_paid`).
 - [ ] Look at why 1,968 positives have no typology (for example, compare their amounts, accounts and times to the mapped ones).
+- [ ] Log a corrected `rules_v2` (working send-count threshold) as a separate MLflow run.
+- [ ] Phase 4: as-of account features and graph features, then `xgb_v2_graph`.
