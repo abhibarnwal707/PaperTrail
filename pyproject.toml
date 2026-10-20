@@ -5,7 +5,7 @@ requires-python = ">=3.10"
 dependencies = ["polars>=1.0", "numpy", "scikit-learn", "xgboost", "shap", "mlflow", "dagshub"]
 
 [project.optional-dependencies]
-gnn   = ["torch", "torch-geometric"]
+gnn   = ["torch"]
 agent = ["langgraph", "langchain-core", "pydantic"]
 api   = ["fastapi", "uvicorn"]
 dev   = ["pytest", "ruff"]

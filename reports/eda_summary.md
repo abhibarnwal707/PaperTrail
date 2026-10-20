@@ -235,6 +235,47 @@ The earlier 0.351 is the best of the three. The honest figure is about **0.31, s
 4. Investigate the 371 unmapped positives, because they cap recall.
 5. The GNN case: cycles and the unmapped positives. Do not promise more than that.
 
+## 5d. Account age, training settings and day 1 (Phase 4c, `notebooks/03c_stability.py`, `03d_stationary.py`)
+
+Run locally on the Mac (03c, partly) and on Kaggle (03d). Raw numbers: `reports/age_distribution.csv`; 03d outputs `stationary_table.csv`, `stationary_metrics.json` once downloaded.
+
+### Account age is a calendar artefact with no signal in val/test
+`age_s` is "time since the account's first transaction in this 18-day window", not a real account age (the data has no opening dates). It therefore grows with the calendar.
+
+| Split | Median sender age, normal rows | Median sender age, laundering rows |
+|---|---|---|
+| train (Sep 1-6) | 1.6 days | 3.1 days |
+| val (Sep 7-8) | 6.9 days | 6.8 days |
+| test (Sep 9-10) | 8.5 days | 8.7 days |
+
+- Day 1 is 1.11M rows (22% of all rows) with 322 positives (0.03% against about 0.2% on days 3-4), and almost every sender looks brand new there. That makes laundering rows look older than normal rows in train, a relationship that does not exist in val or test.
+- The share of senders with no earlier history is 13% of train normal rows but 0.1% of val/test normal rows. Where it happens in val/test, the laundering rate is 5-20x the base rate (but it covers under 1% of positives).
+- **Removing `age_s` costs nothing:** full model test PR-AUC 0.434 +- 0.008, without age 0.429 +- 0.004 (3 seeds, stable settings). Age is dropped.
+- More broadly, features whose meaning depends on how long the dataset has run drift: 7-day windows (never full in train), all-time totals, distinct counterparties so far, age, PageRank, the reverse-edge flag. Only windows of at most 24 h plus the gap since the last event are calendar-stable. `graph_features.recent_features` builds that stable set (30 features); 03d tests it.
+
+### Training settings mattered as much as features
+| XGBoost settings | Val PR-AUC | Test PR-AUC |
+|---|---|---|
+| original (depth 6, full class weight, 50 early stopping) | 0.318 +- 0.015 | 0.301 +- 0.014 |
+| stable (depth 4, min_child_weight 10, lambda 10, subsample/colsample 0.7, sqrt class weight) | 0.498 +- 0.001 | 0.434 +- 0.008 |
+
+The original settings stopped after about 30 trees (overfit to the train period at once); the stable settings use about 600 and have a seed spread 2-10x smaller. Even the tabular-only model rises from 0.046 to 0.065. The 0.312 from 5c was therefore partly a training-settings problem. The local Mac run reproduced the Kaggle number for the original settings (0.301 vs 0.312), so local and Kaggle runs are comparable.
+
+### 03d (Kaggle), arms finished so far (stable settings, 3 seeds; threshold on validation)
+| Arm | Train rows | Test PR-AUC | Test F1 | Recall@1%FPR | Precision@1000 |
+|---|---|---|---|---|---|
+| tabular | 3,248,921 | 0.065 +- 0.003 | 0.148 | 0.454 | 0.145 |
+| tabular + burn-in | 2,134,000 | 0.063 +- 0.001 | 0.145 | 0.452 | 0.140 |
+| v2 history (51 features) | 3,248,921 | **0.442 +- 0.004** | 0.499 | 0.675 | 0.461 |
+| v2 history + burn-in | 2,134,000 | 0.435 +- 0.011 | 0.491 | 0.685 | 0.444 |
+
+- **Burn-in (dropping day-1 rows from training) does not help**: no change for the tabular model, slightly worse (within noise) for v2 history. The hypothesis that the day-1 rows teach a harmful lesson is not supported; dropping them only loses data. Keep day 1 in training.
+- Best iterations are 573-634 of 1,000 allowed, so early stopping now triggers on its own.
+- The `recent` arms (stable feature set, with and without burn-in) were still running when this was written. **Pending:** whether the calendar-stable set matches or beats v2 history. If it is clearly lower, the cumulative features carry real signal that needs separate explanation.
+
+### Current best XGBoost result to beat with the GNN
+Test PR-AUC **0.442 +- 0.004** (3 seeds), F1 0.499, recall@1%FPR 0.675, precision@1000 0.461.
+
 ## 6. Open items
 
 - [x] Save the full daily table (`reports/daily.csv`).
@@ -246,6 +287,8 @@ The earlier 0.351 is the best of the three. The honest figure is about **0.31, s
 - [ ] Log a corrected `rules_v2` (working send-count threshold) as a separate MLflow run.
 - [x] Phase 4: as-of account features and graph features, then `xgb_v2_graph` (section 5b).
 - [x] Phase 4b: ablation (section 5c).
-- [ ] Per-feature ablation inside `totals_timing` (`age_s`, `gap_s`, `tot_out`, `tot_in`) and a train/test distribution check of `age_s`.
+- [x] Distribution check of `age_s` and test of removing it (section 5d). Per-feature ablation of the other timing features not done.
 - [ ] Characterise the 371 unmapped test positives (the model recalls about none).
-- [ ] Stabilise XGBoost training and report multi-seed means.
+- [x] Stabilise XGBoost training (section 5d). Multi-seed means are now the reporting convention.
+- [ ] 03d `recent` arms: calendar-stable features vs v2 history.
+- [ ] Phase 5: GNN (`notebooks/04_gnn.py` / `04-gnn.ipynb`), debug run then full GPU run.
