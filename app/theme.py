@@ -205,8 +205,43 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .ai .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: color-mix(in srgb, var(--violet) 14%, transparent); color: var(--violet); }
 .ai b { display: block; font-size: 14px; font-weight: 600; }
 .ai span { color: var(--muted); font-size: 12.5px; }
+.case { padding: 18px 20px; border-radius: var(--r); border: 1px solid var(--line); background: linear-gradient(90deg, color-mix(in srgb, var(--violet) 6%, transparent), transparent 60%), var(--panel); }
+.case-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.case-top .ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: color-mix(in srgb, var(--violet) 14%, transparent); color: var(--violet); }
+.case-top b { font-size: 15px; font-weight: 600; margin-right: 4px; }
+.case-n { font-size: 14px; line-height: 21px; margin: 14px 0 10px 0; color: var(--text); max-width: 900px; }
+.case-ev { list-style: none; padding: 0; margin: 0; }
+.case-ev li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-top: 1px solid color-mix(in srgb, var(--text) 4.5%, transparent); font-size: 13px; line-height: 19px; }
+.case-ev .src { flex: none; width: 64px; font-size: 11.5px; color: var(--muted); font-family: var(--mono); }
+.case-meta { margin-top: 10px; color: var(--faint); font-size: 11.5px; font-family: var(--mono); }
+.agent-steps { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: -2px 0 14px 0; }
+.agent-steps .st { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 999px; background: color-mix(in srgb, var(--text) 4%, transparent); border: 1px solid var(--line); font-size: 12px; color: var(--text2); }
+.agent-steps .st b { font-family: var(--mono); font-size: 11px; color: var(--violet); font-weight: 500; }
+.agent-steps .ar { color: var(--faint); font-size: 12px; }
+.pane-t { font-size: 13px; font-weight: 600; margin: 0 0 8px 0; display: flex; align-items: center; gap: 8px; }
+.pane-t span { color: var(--muted); font-weight: 400; font-size: 12px; }
+.chat { display: flex; flex-direction: column; gap: 10px; margin: 4px 0 10px 0; }
+.msg { max-width: 92%; padding: 10px 13px; font-size: 13px; line-height: 19px; }
+.msg.user { align-self: flex-end; background: color-mix(in srgb, var(--lime) 14%, transparent); border: 1px solid color-mix(in srgb, var(--lime) 30%, transparent); border-radius: 14px 14px 4px 14px; }
+.msg.bot { align-self: flex-start; background: color-mix(in srgb, var(--text) 4%, transparent); border: 1px solid var(--line); border-radius: 14px 14px 14px 4px; }
+.msg.preview { border-style: dashed; }
+.msg .who { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.msg .who svg { width: 13px; height: 13px; color: var(--violet); }
+.msg .srcs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; align-items: center; }
+.msg .srcs .s { font-family: var(--mono); font-size: 10.5px; padding: 1px 7px; border-radius: 6px; background: color-mix(in srgb, var(--violet) 12%, transparent); color: var(--violet); }
+.msg .srcs .ok { color: var(--mint); font-size: 11px; } .msg .srcs .no { color: var(--amber); font-size: 11px; }
+.msg .srcs .m { color: var(--faint); font-size: 10.5px; font-family: var(--mono); }
+.try-l { color: var(--muted); font-size: 12px; margin: 2px 0 6px 0; }
+.stApp [class*="st-key-chip-"] button { border-radius: 999px !important; min-height: 30px !important; padding: 2px 12px !important; background: color-mix(in srgb, var(--violet) 8%, transparent) !important; border-color: color-mix(in srgb, var(--violet) 28%, transparent) !important; }
+.stApp [class*="st-key-chip-"] button p { font-size: 12px !important; }
+.stApp [class*="st-key-chip-"] button:hover:not(:disabled) { border-color: var(--violet) !important; color: var(--violet) !important; }
+[data-testid="stChatInput"] { background: var(--panel2) !important; border: 1px solid var(--line2) !important; border-radius: 12px !important; }
+[data-testid="stChatInput"] div, [data-testid="stChatInput"] [data-baseweb] { background: transparent !important; border-color: transparent !important; }
+[data-testid="stChatInput"] textarea::placeholder { color: var(--muted) !important; }
+[data-testid="stChatInput"] textarea { color: var(--text) !important; font-family: var(--font) !important; font-size: 13px !important; background: transparent !important; }
+[data-testid="stChatInput"] button { background: var(--lime) !important; color: var(--onbrand) !important; border-radius: 9px !important; }
 .empty { border: 1px dashed var(--line2); border-radius: 12px; padding: 18px; color: var(--muted); font-size: 13px; }
-.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
 .step { display: flex; flex-direction: column; gap: 8px; }
 .step .n { font-family: var(--mono); font-size: 12px; color: var(--lime); }
 .step b { font-size: 15px; font-weight: 600; }
@@ -236,6 +271,10 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 [data-baseweb="popover"] ul, [data-baseweb="popover"] li, [data-baseweb="menu"], [role="listbox"], [role="option"] { background: var(--panel) !important; color: var(--text) !important; }
 [data-baseweb="popover"] li:hover, [role="option"]:hover, [role="option"][aria-selected="true"] { background: var(--panel2) !important; }
 .btn.icon { width: 36px; padding: 0; justify-content: center; }
+.stApp [data-testid^="stBaseButton"] { background: var(--panel) !important; color: var(--text) !important; border: 1px solid var(--line2) !important; border-radius: 10px !important; min-height: 36px; }
+.stApp [data-testid^="stBaseButton"]:hover:not(:disabled) { border-color: var(--lime) !important; color: var(--lime) !important; }
+.stApp [data-testid^="stBaseButton"]:disabled { opacity: .45; }
+.stApp [data-testid^="stBaseButton"] p { font-size: 13px !important; font-weight: 500; }
 
 /* ---------- phone ---------- */
 .mobile-nav { display: none; }
@@ -421,6 +460,49 @@ def legend(parts: list[tuple]) -> str:
     return '<div class="legend">' + "".join(f'<span><span class="d" style="background:{c}"></span>{esc(lab)}<b>{v}</b></span>' for lab, v, c in parts) + "</div>"
 
 
-def ai_placeholder() -> str:
-    return (f'<div class="ai"><span class="ic">{icon("spark")}</span><div><b>AI case summary</b>'
-            '<span>Coming soon: an investigator agent will write up this account, citing the payments above.</span></div></div>')
+def ai_placeholder(text: str = "No summary has been written for this account yet.") -> str:
+    return f'<div class="ai"><span class="ic">{icon("spark")}</span><div><b>AI case summary</b><span>{esc(text)}</span></div></div>'
+
+
+SOURCE_NAME = {"alert": "Alert", "subgraph": "Network", "shap": "Drivers", "history": "History"}
+ACTION_PILL = {"escalate_SAR": ("Escalate (SAR)", "coral"), "enhanced_review": ("Enhanced review", "amber"), "close_false_positive": ("Close: false positive", "mint")}
+
+
+def agent_steps() -> str:
+    steps = [("1", "Gather evidence: alert · network · drivers · history"), ("2", "Draft with an LLM"), ("3", "Check every number"), ("4", "Cite sources")]
+    return '<div class="agent-steps">' + '<span class="ar">→</span>'.join(f'<span class="st"><b>{n}</b>{esc(t)}</span>' for n, t in steps) + "</div>"
+
+
+def chat_html(turns: list[dict], preview: dict | None = None) -> str:
+    """The conversation as bubbles; an agent answer shows the sources it used and whether its numbers checked out."""
+    def bot(text: str, foot: str, cls: str = "") -> str:
+        return f'<div class="msg bot {cls}"><div class="who">{icon("spark")}Investigator</div>{esc(text)}<div class="srcs">{foot}</div></div>'
+
+    out = []
+    if preview and not turns:
+        out.append(f'<div class="msg user">{esc(preview["question"])}</div>')
+        out.append(bot(preview["answer"], '<span class="m">preview · written straight from the tool outputs, no AI</span>', "preview"))
+    for t in turns:
+        srcs = "".join(f'<span class="s">{esc(SOURCE_NAME.get(x.split(":")[0], x))}</span>' for x in t.get("sources", []))
+        mark = '<span class="ok">✓ numbers verified</span>' if t.get("verified") else '<span class="no">not verified</span>'
+        model = f'<span class="m">{esc((t.get("model") or "").split("/")[-1])} · {t.get("latency_s", 0):.0f} s</span>' if t.get("model") else ""
+        out.append(f'<div class="msg user">{esc(t["question"])}</div>')
+        out.append(bot(t["answer"], srcs + mark + model))
+    return f'<div class="chat">{"".join(out)}</div>'
+
+
+def case_card(result: dict, live: bool) -> str:
+    """The investigator's summary: verdict pills, the narrative, each claim with the tool it came from, and how it was made."""
+    s = result["summary"]
+    act, tone = ACTION_PILL.get(s["recommended_action"], (s["recommended_action"], "grey"))
+    check = (pill("Verified against tool outputs", "mint") if result.get("verified")
+             else pill("Partly unverified: only checked facts shown", "amber"))
+    ev = "".join(f'<li><span class="src">{esc(SOURCE_NAME.get(e["source_id"].split(":")[0], e["source_id"]))}</span>{esc(e["claim"])}</li>' for e in s["evidence"])
+    how = " · ".join(x for x in (
+        "live" if live else "cached", f'{result.get("provider") or "?"}/{result.get("model") or "?"}',
+        f'{result["drafts"]} draft{"s" if result.get("drafts", 1) != 1 else ""}' if result.get("drafts") else "",
+        f'{result["total_latency_s"]:.1f} s' if result.get("total_latency_s") else "", result.get("generated_at", "")) if x)
+    return (f'<div class="case"><div class="case-top"><span class="ic">{icon("spark")}</span><b>AI case summary</b>'
+            f'{pill(s["suspected_typology"].title() if s["suspected_typology"] != "UNCLEAR" else "Pattern unclear", "lime" if s["suspected_typology"] != "UNCLEAR" else "grey")}'
+            f'{pill(act, tone)}{check}</div><p class="case-n">{esc(s["narrative"])}</p><ul class="case-ev">{ev}</ul>'
+            f'<div class="case-meta">{esc(how)}</div></div>')

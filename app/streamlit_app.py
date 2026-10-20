@@ -13,6 +13,7 @@ import polars as pl
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))       # the investigator agent lives in src/papertrail/agent
 from app import logic, theme, viz
 
 st.set_page_config(page_title="PaperTrail", layout="wide", initial_sidebar_state="auto")
@@ -22,6 +23,8 @@ PAGES = {"queue": "Alerts", "account": "Investigate", "try": "Simulator", "model
 SEG = {"blend": "Blend", "xgb": "XGBoost", "gnn": "GNN"}
 PLOT = {"displayModeBar": False}
 PER_PAGE = 25
+LIVE_LIMIT, CHAT_LIMIT = 5, 12                                        # live summaries / chat questions per visitor session (free-tier quotas)
+KEY_NAMES = ("LLM_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY")
 DRIFT_URL = "https://abhibarnwal707.github.io/PaperTrail/"       # GitHub Pages, built from docs/ (Phase 8)
 PROFILE_NAMES = {"new_account": "New account", "typical_customer": "Typical customer", "busy_business": "Busy business", "rapid_sender": "Rapid sender", "dormant_returning": "Dormant, returning"}
 
@@ -29,6 +32,29 @@ PROFILE_NAMES = {"new_account": "New account", "typical_customer": "Typical cust
 @st.cache_resource(show_spinner=False)
 def get_bundle(path: str) -> logic.Bundle:
     return logic.load_bundle(path)
+
+
+@st.cache_resource(show_spinner=False)
+def get_toolbox(path: str):
+    from papertrail.agent.tools import Toolbox
+
+    return Toolbox(path)
+
+
+def agent_ready() -> tuple[bool, str]:
+    """Live generation needs the agent's packages and at least one key (Streamlit secrets on the Cloud, .env locally)."""
+    try:
+        from papertrail.agent.llm import load_env
+    except ImportError as e:
+        return False, f"the agent's packages are not installed here ({e.name})"
+    load_env(Path(__file__).resolve().parents[1] / ".env")
+    for k in KEY_NAMES:
+        try:
+            if k in st.secrets and not os.environ.get(k):
+                os.environ[k] = str(st.secrets[k])
+        except Exception:  # noqa: BLE001  (no secrets file at all)
+            break
+    return (True, "") if any(os.environ.get(k) for k in KEY_NAMES) else (False, "no API key is configured here")
 
 
 def view_state() -> dict:
@@ -173,7 +199,134 @@ def page_account(b: logic.Bundle, S: dict) -> None:
         truth = theme.pill(f'Laundering · {row["typologies_truth"]}' if row["n_laundering"] else "Clean account", "coral" if row["n_laundering"] else "mint", big=True)
         html(f'<div class="gap"></div><div class="card" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">{truth}'
              f'<span class="note"><b>{row["n_laundering"]}</b> laundering payments in the window · picked as <b>{theme.esc(row["tag"])}</b></span></div>')
-    html('<div class="gap"></div>' + theme.ai_placeholder())
+    html('<div class="gap"></div>')
+    investigator_section(b, account)
+
+
+def investigator_section(b: logic.Bundle, account: str) -> None:
+    """The agent's panel: how it works, the case summary (cached or live) and a chat about this account."""
+    ok, why = agent_ready()
+    with st.container(border=True):
+        html(theme.card_head("Investigator agent", "Writes a case summary and answers questions, using only this account's data",
+                             ic="spark", hint="An LLM reads the four tool outputs, drafts an answer, and a checker rejects any number "
+                             "that is not in the source it cites. One retry, then it falls back to showing only checked facts."))
+        html(theme.agent_steps())
+        if ok:
+            model_picker()
+        left, right = st.columns([7, 5], gap="large")
+        with left:
+            summary_pane(b, account, ok, why)
+        with right:
+            chat_pane(b, account, ok, why)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def find_free_models() -> list:
+    from papertrail.agent.llm import discover_free_models
+
+    return discover_free_models()
+
+
+def model_picker() -> None:
+    """Auto (the curated list in order) or one model; "Find more free models" adds OpenRouter's current free list."""
+    from papertrail.agent.llm import available, providers_from_env
+
+    found = st.session_state.setdefault("found_models", [])
+    have = {p.name for p in providers_from_env()}
+    choices = available() + [c for c in found if c.provider in have]
+    options = ["auto"] + [c.key for c in choices]
+    by_key = {c.key: c for c in choices}
+    label = lambda k: "Auto · best available, with fallback" if k == "auto" else f"{by_key[k].label} · {by_key[k].note.split(' · ')[0]}"
+    c1, c2, c3 = st.columns([4, 2, 5], gap="small", vertical_alignment="center")
+    pick = c1.selectbox("Model", options, format_func=label, key="model_key", label_visibility="collapsed")
+    if c2.button("Find more free models", key="find-models", disabled="openrouter" not in have,
+                 help="Fetch OpenRouter's current free models (they change often and are not tested here)"):
+        try:
+            st.session_state["found_models"] = find_free_models()
+        except Exception as e:  # noqa: BLE001
+            st.session_state["find_error"] = str(e)[:120]
+        st.rerun()
+    note = ("Tries the curated models in order and falls back automatically when one is busy." if pick == "auto" else by_key[pick].note)
+    if found:
+        note += f" · {len(found)} more free models found"
+    if st.session_state.get("find_error"):
+        note += f" · could not fetch the list: {st.session_state['find_error']}"
+    c3.markdown(f'<span class="note">{theme.esc(note)}</span>', unsafe_allow_html=True)
+
+
+def llm_client():
+    """One client per chosen model for this visitor, so it remembers which model worked and which to skip."""
+    from papertrail.agent.llm import ChatClient, available
+
+    key = st.session_state.get("model_key", "auto")
+    clients = st.session_state.setdefault("clients", {})
+    if key not in clients:
+        pool = {c.key: c for c in available() + st.session_state.get("found_models", [])}
+        clients[key] = ChatClient(model=pool.get(key))
+    return clients[key]
+
+
+def summary_pane(b: logic.Bundle, account: str, ok: bool, why: str) -> None:
+    live = st.session_state.setdefault("cases", {})
+    result, is_live = (live[account], True) if account in live else (b.cases.get(account), False)
+    if result:
+        html(theme.case_card(result, is_live))
+    else:
+        html(theme.ai_placeholder("No summary is cached for this account yet. Generate one live below." if ok
+                                  else f"No summary is cached for this account, and live generation is off: {why}."))
+    if not ok:
+        return
+    used = st.session_state.setdefault("live_runs", 0)
+    left = LIVE_LIMIT - used
+    c1, c2 = st.columns([2, 5], gap="small", vertical_alignment="center")
+    clicked = c1.button("Regenerate live" if result else "Generate live", key=f"gen-{account}", disabled=left <= 0)
+    c2.markdown(f'<span class="note">{left} live run{"s" if left != 1 else ""} left · about 10-30 s · free models, so wording varies</span>'
+                if left > 0 else '<span class="note">Live limit reached for this session; cached summaries stay available.</span>', unsafe_allow_html=True)
+    if clicked:
+        from papertrail.agent.graph import investigate
+
+        with st.spinner("Gathering evidence, drafting, checking every number..."):
+            try:
+                live[account] = investigate(account, get_toolbox(str(b.root)), llm_client())
+                st.session_state["live_runs"] = used + 1
+            except Exception as e:  # noqa: BLE001
+                st.error(f"Live generation failed: {str(e)[:200]}")
+                return
+        st.rerun()
+
+
+def chat_pane(b: logic.Bundle, account: str, ok: bool, why: str) -> None:
+    try:
+        from papertrail.agent.chat import (
+            CHIP_LABELS,
+            EXAMPLE_QUESTIONS,
+            ask,
+            preview_answer,
+        )
+    except ImportError:
+        html('<div class="note">The chat needs the agent packages, which are not installed here.</div>')
+        return
+    chats = st.session_state.setdefault("chat", {})
+    turns = chats.setdefault(account, [])
+    asked = st.session_state.setdefault("chat_runs", 0)
+    left = CHAT_LIMIT - asked
+    html(f'<div class="pane-t">Ask about this account<span>{left if ok else 0} questions left</span></div>')
+    preview = None if turns else preview_answer(account, get_toolbox(str(b.root)))
+    html(theme.chat_html(turns, preview))
+    question = None
+    if len(turns) < 2:
+        html('<div class="try-l">Try asking</div>')
+        cols = st.columns(2, gap="small")
+        for i, q in enumerate(EXAMPLE_QUESTIONS[1:]):
+            if cols[i % 2].button(CHIP_LABELS[q], key=f"chip-{account}-{i}", help=q, disabled=not ok or left <= 0, width="stretch"):
+                question = q
+    typed = st.chat_input("Ask about this account..." if ok else f"Chat is off here: {why}", key=f"ask-{account}", disabled=not ok or left <= 0)
+    question = typed or question
+    if question:
+        with st.spinner("Reading the evidence..."):
+            turns.append(ask(question, account, get_toolbox(str(b.root)), llm_client(), turns=turns))
+            st.session_state["chat_runs"] = asked + 1
+        st.rerun()
 
 
 def page_try(b: logic.Bundle, S: dict) -> None:
@@ -270,7 +423,8 @@ def page_about(b: logic.Bundle, S: dict) -> None:
     steps = [("01", "Features", "Each payment plus the recent history of both accounts, using only earlier payments."),
              ("02", "XGBoost", "Reads the payment and account behaviour: frequency, fan-out, recency."),
              ("03", "Graph network", "A GNN reads the web of payments around each account, from earlier days only."),
-             ("04", "Blend", "Scores are standardised and mixed; the blend beats either model alone.")]
+             ("04", "Blend", "Scores are standardised and mixed; the blend beats either model alone."),
+             ("05", "Investigator agent", "An LLM writes case summaries and answers questions; every number it states is checked against its source.")]
     html('<div class="facts">' + "".join(f'<div class="card step"><span class="n">{n}</span><b>{t}</b><span>{d}</span></div>' for n, t, d in steps) + "</div>")
     html(f'<div class="gap"></div><div class="note">Train Sep 1–6 · validate Sep 7–8 · test {theme.esc(m["test_window"])} ({m["n_test_transactions"]:,} payments). '
          'Synthetic data; a demonstration of the method, not a product for real banks.</div>')

@@ -6,3 +6,8 @@ polars>=2.0,<3
 plotly>=7.1,<8
 numpy>=2.0
 xgboost-cpu==3.4.1
+# the investigator agent (src/papertrail/agent): LangGraph flow, pydantic schema, plain-HTTP calls to Groq / OpenRouter
+langgraph==1.2.16
+langchain-core>=1.6,<2
+pydantic>=2.7,<3
+httpx>=0.27,<1

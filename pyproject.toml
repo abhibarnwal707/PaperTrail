@@ -6,7 +6,7 @@ dependencies = ["polars>=1.0", "numpy", "scikit-learn", "xgboost", "shap", "mlfl
 
 [project.optional-dependencies]
 gnn   = ["torch"]
-agent = ["langgraph", "langchain-core", "pydantic"]
+agent = ["langgraph", "langchain-core", "pydantic", "httpx"]
 api   = ["fastapi", "uvicorn", "pydantic"]
 app   = ["streamlit>=1.46", "plotly"]
 dev   = ["pytest", "ruff", "httpx"]

@@ -1,0 +1,2478 @@
+{
+ "50528_812D0C600": {
+  "summary": {
+   "account_id": "50528_812D0C600",
+   "risk_score": 5.31,
+   "suspected_typology": "CYCLE",
+   "evidence": [
+    {
+     "claim": "the blend model assigned a risk_score of 5.31",
+     "source_id": "alert:50528_812D0C600"
+    },
+    {
+     "claim": "the account has 5 flagged payments",
+     "source_id": "alert:50528_812D0C600"
+    },
+    {
+     "claim": "there are 5 distinct senders paying the account",
+     "source_id": "subgraph:50528_812D0C600"
+    },
+    {
+     "claim": "the account sent payments to 2 distinct receivers",
+     "source_id": "subgraph:50528_812D0C600"
+    },
+    {
+     "claim": "the neighbourhood contains 2 two\u2011step cycles and 2 three\u2011step cycles",
+     "source_id": "subgraph:50528_812D0C600"
+    }
+   ],
+   "narrative": "The account shows a moderate risk score of 5.31 with five flagged payments. It receives funds from five different senders but only sends to two receivers. The transaction graph includes multiple two\u2011step and three\u2011step cycles, indicating money returning to its origin. These patterns suggest a cyclical flow of funds.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "50528_812D0C600",
+     "risk_score": 5.31,
+     "suspected_typology": "CYCLE",
+     "evidence": [
+      {
+       "claim": "the blend model assigned a risk_score of 5.31",
+       "source_id": "alert:50528_812D0C600"
+      },
+      {
+       "claim": "the account has 5 flagged payments",
+       "source_id": "alert:50528_812D0C600"
+      },
+      {
+       "claim": "there are 5 distinct senders paying the account",
+       "source_id": "subgraph:50528_812D0C600"
+      },
+      {
+       "claim": "the account sent payments to 2 distinct receivers",
+       "source_id": "subgraph:50528_812D0C600"
+      },
+      {
+       "claim": "the neighbourhood contains 2 two\u2011step cycles and 2 three\u2011step cycles",
+       "source_id": "subgraph:50528_812D0C600"
+      }
+     ],
+     "narrative": "The account shows a moderate risk score of 5.31 with five flagged payments. It receives funds from five different senders but only sends to two receivers. The transaction graph includes multiple two\u2011step and three\u2011step cycles, indicating money returning to its origin. These patterns suggest a cyclical flow of funds.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "llm_latency_s": 1.45,
+  "tokens": 4086,
+  "generated_at": "2026-10-20 17:44 UTC",
+  "total_latency_s": 2.7
+ },
+ "148350_812D0C3C0": {
+  "summary": {
+   "account_id": "148350_812D0C3C0",
+   "risk_score": 5.31,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "the blend model assigned a risk_score of 5.31",
+     "source_id": "alert:148350_812D0C3C0"
+    },
+    {
+     "claim": "the subgraph shows 7 distinct senders to the account",
+     "source_id": "subgraph:148350_812D0C3C0"
+    },
+    {
+     "claim": "the subgraph shows only 2 distinct receivers from the account",
+     "source_id": "subgraph:148350_812D0C3C0"
+    },
+    {
+     "claim": "there are 2 two\u2011step cycles involving the account",
+     "source_id": "subgraph:148350_812D0C3C0"
+    },
+    {
+     "claim": "9 flagged payments touch the account in its neighbourhood",
+     "source_id": "subgraph:148350_812D0C3C0"
+    }
+   ],
+   "narrative": "The account has a moderate risk_score of 5.31 and receives payments from 7 different senders while sending to only 2 receivers. Two\u2011step cycles are present and nine flagged payments are linked to its network, indicating concentrated inbound activity. These signals suggest a fan\u2011in pattern that warrants closer scrutiny.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "148350_812D0C3C0",
+     "risk_score": 5.31,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "the blend model assigned a risk_score of 5.31",
+       "source_id": "alert:148350_812D0C3C0"
+      },
+      {
+       "claim": "the subgraph shows 7 distinct senders to the account",
+       "source_id": "subgraph:148350_812D0C3C0"
+      },
+      {
+       "claim": "the subgraph shows only 2 distinct receivers from the account",
+       "source_id": "subgraph:148350_812D0C3C0"
+      },
+      {
+       "claim": "there are 2 two\u2011step cycles involving the account",
+       "source_id": "subgraph:148350_812D0C3C0"
+      },
+      {
+       "claim": "9 flagged payments touch the account in its neighbourhood",
+       "source_id": "subgraph:148350_812D0C3C0"
+      }
+     ],
+     "narrative": "The account has a moderate risk_score of 5.31 and receives payments from 7 different senders while sending to only 2 receivers. Two\u2011step cycles are present and nine flagged payments are linked to its network, indicating concentrated inbound activity. These signals suggest a fan\u2011in pattern that warrants closer scrutiny.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "llm_latency_s": 1.62,
+  "tokens": 4182,
+  "generated_at": "2026-10-20 17:44 UTC",
+  "total_latency_s": 1.64
+ },
+ "119_812A09CF0": {
+  "summary": {
+   "account_id": "119_812A09CF0",
+   "risk_score": 5.06,
+   "suspected_typology": "FAN-OUT",
+   "evidence": [
+    {
+     "claim": "The account sent payments to 2 distinct receivers",
+     "source_id": "subgraph:119_812A09CF0"
+    },
+    {
+     "claim": "There is 1 distinct sender to the account",
+     "source_id": "subgraph:119_812A09CF0"
+    },
+    {
+     "claim": "The account has 1 two\u2011step cycle",
+     "source_id": "subgraph:119_812A09CF0"
+    },
+    {
+     "claim": "The account has 9 flagged payments in its neighbourhood",
+     "source_id": "subgraph:119_812A09CF0"
+    },
+    {
+     "claim": "The account\u2019s riskiest payment was 5.06",
+     "source_id": "alert:119_812A09CF0"
+    },
+    {
+     "claim": "The account\u2019s blend model flagged 6 payments",
+     "source_id": "alert:119_812A09CF0"
+    }
+   ],
+   "narrative": "The account has a small fan\u2011out of 2 receivers but a single sender, indicating a limited distribution pattern. It also shows a single two\u2011step cycle and nine flagged payments nearby, raising concern. The blend risk score of 5.06 and six flagged payments support a moderate risk assessment. Overall, the structure suggests a potential fan\u2011out typology.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "119_812A09CF0",
+     "risk_score": 5.06,
+     "suspected_typology": "FAN-OUT",
+     "evidence": [
+      {
+       "claim": "The account sent payments to 2 distinct receivers",
+       "source_id": "subgraph:119_812A09CF0"
+      },
+      {
+       "claim": "There is 1 distinct sender to the account",
+       "source_id": "subgraph:119_812A09CF0"
+      },
+      {
+       "claim": "The account has 1 two\u2011step cycle",
+       "source_id": "subgraph:119_812A09CF0"
+      },
+      {
+       "claim": "The account has 9 flagged payments in its neighbourhood",
+       "source_id": "subgraph:119_812A09CF0"
+      },
+      {
+       "claim": "The account\u2019s riskiest payment was 5.06",
+       "source_id": "alert:119_812A09CF0"
+      },
+      {
+       "claim": "The account\u2019s blend model flagged 6 payments",
+       "source_id": "alert:119_812A09CF0"
+      }
+     ],
+     "narrative": "The account has a small fan\u2011out of 2 receivers but a single sender, indicating a limited distribution pattern. It also shows a single two\u2011step cycle and nine flagged payments nearby, raising concern. The blend risk score of 5.06 and six flagged payments support a moderate risk assessment. Overall, the structure suggests a potential fan\u2011out typology.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "llm_latency_s": 1.0,
+  "tokens": 3966,
+  "generated_at": "2026-10-20 17:45 UTC",
+  "total_latency_s": 1.06
+ },
+ "1467_800728800": {
+  "summary": {
+   "account_id": "1467_800728800",
+   "risk_score": 5.22,
+   "suspected_typology": "FAN-OUT",
+   "evidence": [
+    {
+     "claim": "The account sent payments to 5 distinct receivers",
+     "source_id": "subgraph:1467_800728800"
+    },
+    {
+     "claim": "The account received payments from 2 distinct senders",
+     "source_id": "subgraph:1467_800728800"
+    },
+    {
+     "claim": "There is 1 flagged payment touching the account",
+     "source_id": "subgraph:1467_800728800"
+    },
+    {
+     "claim": "There is 1 flagged payment in the neighbourhood of the account",
+     "source_id": "subgraph:1467_800728800"
+    },
+    {
+     "claim": "The account sent 71 direct payments in the two\u2011hop window",
+     "source_id": "subgraph:1467_800728800"
+    },
+    {
+     "claim": "The account received 29 direct payments in the two\u2011hop window",
+     "source_id": "subgraph:1467_800728800"
+    }
+   ],
+   "narrative": "The account has a moderate risk score of 5.22 and shows a fan\u2011out pattern, sending to 5 receivers while only receiving from 2 senders. One payment involving the account is flagged, and the neighbourhood also contains a flagged payment. The activity is concentrated in a small two\u2011hop network with 71 outgoing and 29 incoming payments.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "1467_800728800",
+     "risk_score": 5.22,
+     "suspected_typology": "FAN-OUT",
+     "evidence": [
+      {
+       "claim": "The account sent payments to 5 distinct receivers",
+       "source_id": "subgraph:1467_800728800"
+      },
+      {
+       "claim": "The account received payments from 2 distinct senders",
+       "source_id": "subgraph:1467_800728800"
+      },
+      {
+       "claim": "There is 1 flagged payment touching the account",
+       "source_id": "subgraph:1467_800728800"
+      },
+      {
+       "claim": "There is 1 flagged payment in the neighbourhood of the account",
+       "source_id": "subgraph:1467_800728800"
+      },
+      {
+       "claim": "The account sent 71 direct payments in the two\u2011hop window",
+       "source_id": "subgraph:1467_800728800"
+      },
+      {
+       "claim": "The account received 29 direct payments in the two\u2011hop window",
+       "source_id": "subgraph:1467_800728800"
+      }
+     ],
+     "narrative": "The account has a moderate risk score of 5.22 and shows a fan\u2011out pattern, sending to 5 receivers while only receiving from 2 senders. One payment involving the account is flagged, and the neighbourhood also contains a flagged payment. The activity is concentrated in a small two\u2011hop network with 71 outgoing and 29 incoming payments.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "llm_latency_s": 1.29,
+  "tokens": 4082,
+  "generated_at": "2026-10-20 17:45 UTC",
+  "total_latency_s": 1.31
+ },
+ "17854_811AF2F80": {
+  "summary": {
+   "account_id": "17854_811AF2F80",
+   "risk_score": 5.22,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The blended risk score is 5.22.",
+     "source_id": "alert:17854_811AF2F80"
+    },
+    {
+     "claim": "There are 2 flagged payments among 5 payments in the window.",
+     "source_id": "alert:17854_811AF2F80"
+    },
+    {
+     "claim": "The account has 1 distinct receiver and 2 distinct senders.",
+     "source_id": "subgraph:17854_811AF2F80"
+    },
+    {
+     "claim": "The two-step and three-step cycle counts are 0.",
+     "source_id": "subgraph:17854_811AF2F80"
+    },
+    {
+     "claim": "The largest payment was 14655.44 and used ACH.",
+     "source_id": "history:17854_811AF2F80"
+    }
+   ],
+   "narrative": "The account's blended risk score is 5.22, and 2 payments were flagged. Its network shows 1 distinct receiver and 2 distinct senders, with 0 two-step cycles, 0 three-step cycles, and no counterparties appearing in both directions. The evidence confirms flagged activity but does not establish a clear network typology, so enhanced review is appropriate.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "17854_811AF2F80",
+     "risk_score": 5.22,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The blended risk score is 5.22.",
+       "source_id": "alert:17854_811AF2F80"
+      },
+      {
+       "claim": "There are 2 flagged payments among 5 payments in the window.",
+       "source_id": "alert:17854_811AF2F80"
+      },
+      {
+       "claim": "The account has 1 distinct receiver and 2 distinct senders.",
+       "source_id": "subgraph:17854_811AF2F80"
+      },
+      {
+       "claim": "The two-step and three-step cycle counts are 0.",
+       "source_id": "subgraph:17854_811AF2F80"
+      },
+      {
+       "claim": "The largest payment was 14655.44 and used ACH.",
+       "source_id": "history:17854_811AF2F80"
+      }
+     ],
+     "narrative": "The account's blended risk score is 5.22, and 2 payments were flagged. Its network shows 1 distinct receiver and 2 distinct senders, with 0 two-step cycles, 0 three-step cycles, and no counterparties appearing in both directions. The evidence confirms flagged activity but does not establish a clear network typology, so enhanced review is appropriate.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 8.51,
+  "tokens": 3491,
+  "generated_at": "2026-10-20 17:45 UTC",
+  "total_latency_s": 8.6
+ },
+ "49365_812A09D40": {
+  "summary": {
+   "account_id": "49365_812A09D40",
+   "risk_score": 5.06,
+   "suspected_typology": "CYCLE",
+   "evidence": [
+    {
+     "claim": "The account's blend risk score is 5.06 and its rank is 71.",
+     "source_id": "alert:49365_812A09D40"
+    },
+    {
+     "claim": "The alert identifies 6 flagged payments.",
+     "source_id": "alert:49365_812A09D40"
+    },
+    {
+     "claim": "The payment network contains 1 two-step cycle.",
+     "source_id": "subgraph:49365_812A09D40"
+    },
+    {
+     "claim": "The network shows 23 direct payments sent and 35 direct payments received.",
+     "source_id": "subgraph:49365_812A09D40"
+    },
+    {
+     "claim": "The account history contains 9 flagged payments.",
+     "source_id": "history:49365_812A09D40"
+    },
+    {
+     "claim": "The receiver had previously paid the sender, which raises the risk of the most recent payment.",
+     "source_id": "shap:49365_812A09D40"
+    }
+   ],
+   "narrative": "The account has a blend risk score of 5.06, a rank of 71, and 6 flagged payments. Its history contains 9 flagged payments, including repeated payments in both directions with the same counterparty. The network contains 1 two-step cycle, while the most recent payment was raised-risk by an ACH transfer and prior reciprocal payment activity. These signals support escalation for detailed review.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "49365_812A09D40",
+     "risk_score": 5.06,
+     "suspected_typology": "CYCLE",
+     "evidence": [
+      {
+       "claim": "The account's blend risk score is 5.06 and its rank is 71.",
+       "source_id": "alert:49365_812A09D40"
+      },
+      {
+       "claim": "The alert identifies 6 flagged payments.",
+       "source_id": "alert:49365_812A09D40"
+      },
+      {
+       "claim": "The payment network contains 1 two-step cycle.",
+       "source_id": "subgraph:49365_812A09D40"
+      },
+      {
+       "claim": "The network shows 23 direct payments sent and 35 direct payments received.",
+       "source_id": "subgraph:49365_812A09D40"
+      },
+      {
+       "claim": "The account history contains 9 flagged payments.",
+       "source_id": "history:49365_812A09D40"
+      },
+      {
+       "claim": "The receiver had previously paid the sender, which raises the risk of the most recent payment.",
+       "source_id": "shap:49365_812A09D40"
+      }
+     ],
+     "narrative": "The account has a blend risk score of 5.06, a rank of 71, and 6 flagged payments. Its history contains 9 flagged payments, including repeated payments in both directions with the same counterparty. The network contains 1 two-step cycle, while the most recent payment was raised-risk by an ACH transfer and prior reciprocal payment activity. These signals support escalation for detailed review.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 8.67,
+  "tokens": 4477,
+  "generated_at": "2026-10-20 17:45 UTC",
+  "total_latency_s": 8.68
+ },
+ "22164_8014621B0": {
+  "summary": {
+   "account_id": "22164_8014621B0",
+   "risk_score": 5.29,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account received payments from 1 distinct sender.",
+     "source_id": "subgraph:22164_8014621B0"
+    },
+    {
+     "claim": "The account sent payments to 1 distinct receiver.",
+     "source_id": "subgraph:22164_8014621B0"
+    },
+    {
+     "claim": "No two-step or three-step cycles were detected.",
+     "source_id": "subgraph:22164_8014621B0"
+    },
+    {
+     "claim": "There are 0 counterparties with payments in both directions.",
+     "source_id": "subgraph:22164_8014621B0"
+    },
+    {
+     "claim": "The flagged payment was made by ACH transfer.",
+     "source_id": "shap:22164_8014621B0"
+    },
+    {
+     "claim": "The sender's time since its previous activity was 0.0 hours.",
+     "source_id": "shap:22164_8014621B0"
+    }
+   ],
+   "narrative": "The account shows a limited payment pattern with no detected loop or two-sided counterparty relationship. The most recent flagged payment was an ACH transfer, and its risk is associated with timing and receiver activity. The network evidence does not establish a clear aggregation, dispersal, or layered pattern, so the signals support enhanced review rather than immediate escalation.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "22164_8014621B0",
+     "risk_score": 5.29,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account received payments from 1 distinct sender.",
+       "source_id": "subgraph:22164_8014621B0"
+      },
+      {
+       "claim": "The account sent payments to 1 distinct receiver.",
+       "source_id": "subgraph:22164_8014621B0"
+      },
+      {
+       "claim": "No two-step or three-step cycles were detected.",
+       "source_id": "subgraph:22164_8014621B0"
+      },
+      {
+       "claim": "There are 0 counterparties with payments in both directions.",
+       "source_id": "subgraph:22164_8014621B0"
+      },
+      {
+       "claim": "The flagged payment was made by ACH transfer.",
+       "source_id": "shap:22164_8014621B0"
+      },
+      {
+       "claim": "The sender's time since its previous activity was 0.0 hours.",
+       "source_id": "shap:22164_8014621B0"
+      }
+     ],
+     "narrative": "The account shows a limited payment pattern with no detected loop or two-sided counterparty relationship. The most recent flagged payment was an ACH transfer, and its risk is associated with timing and receiver activity. The network evidence does not establish a clear aggregation, dispersal, or layered pattern, so the signals support enhanced review rather than immediate escalation.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 10.31,
+  "tokens": 3384,
+  "generated_at": "2026-10-20 17:45 UTC",
+  "total_latency_s": 10.33
+ },
+ "11056_800E3D880": {
+  "summary": {
+   "account_id": "11056_800E3D880",
+   "risk_score": 5.29,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "13 different accounts paid the account, while it sent payments to 6 different accounts.",
+     "source_id": "subgraph:11056_800E3D880"
+    },
+    {
+     "claim": "The account was ranked 26 in the alert results.",
+     "source_id": "alert:11056_800E3D880"
+    },
+    {
+     "claim": "4 payments were flagged for the account.",
+     "source_id": "alert:11056_800E3D880"
+    },
+    {
+     "claim": "8 flagged payments touched the account, and 8 flagged payments were present in its neighbourhood.",
+     "source_id": "subgraph:11056_800E3D880"
+    },
+    {
+     "claim": "The most recent payment was an ACH transfer that raised risk.",
+     "source_id": "shap:11056_800E3D880"
+    }
+   ],
+   "narrative": "The account shows a fan-in pattern, with 13 different accounts paying it and comparatively fewer outbound recipients. The alert identifies 4 flagged payments and a rank of 26, while the wider neighbourhood also contains flagged activity. The most recent payment was an ACH transfer identified as a risk-raising factor, supporting escalation for detailed review.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "11056_800E3D880",
+     "risk_score": 5.29,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "13 different accounts paid the account, while it sent payments to 6 different accounts.",
+       "source_id": "subgraph:11056_800E3D880"
+      },
+      {
+       "claim": "The account was ranked 26 in the alert results.",
+       "source_id": "alert:11056_800E3D880"
+      },
+      {
+       "claim": "4 payments were flagged for the account.",
+       "source_id": "alert:11056_800E3D880"
+      },
+      {
+       "claim": "8 flagged payments touched the account, and 8 flagged payments were present in its neighbourhood.",
+       "source_id": "subgraph:11056_800E3D880"
+      },
+      {
+       "claim": "The most recent payment was an ACH transfer that raised risk.",
+       "source_id": "shap:11056_800E3D880"
+      }
+     ],
+     "narrative": "The account shows a fan-in pattern, with 13 different accounts paying it and comparatively fewer outbound recipients. The alert identifies 4 flagged payments and a rank of 26, while the wider neighbourhood also contains flagged activity. The most recent payment was an ACH transfer identified as a risk-raising factor, supporting escalation for detailed review.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 6.5,
+  "tokens": 4536,
+  "generated_at": "2026-10-20 17:45 UTC",
+  "total_latency_s": 6.52
+ },
+ "13858_801820540": {
+  "summary": {
+   "account_id": "13858_801820540",
+   "risk_score": 5.28,
+   "suspected_typology": "FAN-OUT",
+   "evidence": [
+    {
+     "claim": "The account sent 7 direct payments and received 2 direct payments.",
+     "source_id": "subgraph:13858_801820540"
+    },
+    {
+     "claim": "The account paid 3 different receivers, while no different senders paid the account.",
+     "source_id": "subgraph:13858_801820540"
+    },
+    {
+     "claim": "There were 3 flagged payments in the neighbourhood and 1 flagged payment touching the account.",
+     "source_id": "subgraph:13858_801820540"
+    },
+    {
+     "claim": "The account's risk score was 5.28, above the alert line of 3.89, with 1 flagged payment.",
+     "source_id": "alert:13858_801820540"
+    },
+    {
+     "claim": "The most recent payment was an ACH transfer of 9511.58 and was flagged.",
+     "source_id": "history:13858_801820540"
+    },
+    {
+     "claim": "The payment was made by ACH transfer, and the sender's time since the account's previous activity was 0.0 hours.",
+     "source_id": "shap:13858_801820540"
+    }
+   ],
+   "narrative": "The account primarily sends payments to multiple receivers, including 3 distinct receivers, and has no observed incoming senders. Its risk score of 5.28 exceeded the alert line of 3.89, and 1 payment was flagged. The flagged payment was an ACH transfer, with recent account activity and the receiver's broader payment activity also contributing to the risk assessment.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "13858_801820540",
+     "risk_score": 5.28,
+     "suspected_typology": "FAN-OUT",
+     "evidence": [
+      {
+       "claim": "The account sent 7 direct payments and received 2 direct payments.",
+       "source_id": "subgraph:13858_801820540"
+      },
+      {
+       "claim": "The account paid 3 different receivers, while no different senders paid the account.",
+       "source_id": "subgraph:13858_801820540"
+      },
+      {
+       "claim": "There were 3 flagged payments in the neighbourhood and 1 flagged payment touching the account.",
+       "source_id": "subgraph:13858_801820540"
+      },
+      {
+       "claim": "The account's risk score was 5.28, above the alert line of 3.89, with 1 flagged payment.",
+       "source_id": "alert:13858_801820540"
+      },
+      {
+       "claim": "The most recent payment was an ACH transfer of 9511.58 and was flagged.",
+       "source_id": "history:13858_801820540"
+      },
+      {
+       "claim": "The payment was made by ACH transfer, and the sender's time since the account's previous activity was 0.0 hours.",
+       "source_id": "shap:13858_801820540"
+      }
+     ],
+     "narrative": "The account primarily sends payments to multiple receivers, including 3 distinct receivers, and has no observed incoming senders. Its risk score of 5.28 exceeded the alert line of 3.89, and 1 payment was flagged. The flagged payment was an ACH transfer, with recent account activity and the receiver's broader payment activity also contributing to the risk assessment.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 10.51,
+  "tokens": 3727,
+  "generated_at": "2026-10-20 17:46 UTC",
+  "total_latency_s": 10.52
+ },
+ "48309_811C599A0": {
+  "summary": {
+   "account_id": "48309_811C599A0",
+   "risk_score": 5.32,
+   "suspected_typology": "CYCLE",
+   "evidence": [
+    {
+     "claim": "The account's risk score is 5.32, and 6 payments were flagged in the alert.",
+     "source_id": "alert:48309_811C599A0"
+    },
+    {
+     "claim": "The surrounding network contains 3 two-step cycles and 2 three-step cycles.",
+     "source_id": "subgraph:48309_811C599A0"
+    },
+    {
+     "claim": "There are 3 counterparties that transact with the account in both directions.",
+     "source_id": "subgraph:48309_811C599A0"
+    },
+    {
+     "claim": "There are 12 flagged payments touching the account.",
+     "source_id": "subgraph:48309_811C599A0"
+    },
+    {
+     "claim": "The payment history contains 5 flagged payments, with 11 payments sent and 9 payments received.",
+     "source_id": "history:48309_811C599A0"
+    }
+   ],
+   "narrative": "The account is ranked 19 among 200 accounts in the queue and has 6 flagged payments in the alert. The surrounding network contains 3 two-step cycles and 2 three-step cycles, while 3 counterparties transact with the account in both directions. These independent indicators, together with 12 flagged payments touching the account, support escalation.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "48309_811C599A0",
+     "risk_score": 5.32,
+     "suspected_typology": "CYCLE",
+     "evidence": [
+      {
+       "claim": "The account's risk score is 5.32, and 6 payments were flagged in the alert.",
+       "source_id": "alert:48309_811C599A0"
+      },
+      {
+       "claim": "The surrounding network contains 3 two-step cycles and 2 three-step cycles.",
+       "source_id": "subgraph:48309_811C599A0"
+      },
+      {
+       "claim": "There are 3 counterparties that transact with the account in both directions.",
+       "source_id": "subgraph:48309_811C599A0"
+      },
+      {
+       "claim": "There are 12 flagged payments touching the account.",
+       "source_id": "subgraph:48309_811C599A0"
+      },
+      {
+       "claim": "The payment history contains 5 flagged payments, with 11 payments sent and 9 payments received.",
+       "source_id": "history:48309_811C599A0"
+      }
+     ],
+     "narrative": "The account is ranked 19 among 200 accounts in the queue and has 6 flagged payments in the alert. The surrounding network contains 3 two-step cycles and 2 three-step cycles, while 3 counterparties transact with the account in both directions. These independent indicators, together with 12 flagged payments touching the account, support escalation.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 7.78,
+  "tokens": 4562,
+  "generated_at": "2026-10-20 17:46 UTC",
+  "total_latency_s": 7.79
+ },
+ "150240_812D22980": {
+  "summary": {
+   "account_id": "150240_812D22980",
+   "risk_score": 5.32,
+   "suspected_typology": "CYCLE",
+   "evidence": [
+    {
+     "claim": "The alert assigns the account a risk score of 5.32.",
+     "source_id": "alert:150240_812D22980"
+    },
+    {
+     "claim": "The alert records 3 flagged payments.",
+     "source_id": "alert:150240_812D22980"
+    },
+    {
+     "claim": "The network contains 3 two-step cycles and 2 three-step cycles.",
+     "source_id": "subgraph:150240_812D22980"
+    },
+    {
+     "claim": "11 flagged payments touch the account in the broader neighborhood.",
+     "source_id": "subgraph:150240_812D22980"
+    },
+    {
+     "claim": "3 counterparties made payments in both directions with the account.",
+     "source_id": "subgraph:150240_812D22980"
+    },
+    {
+     "claim": "The receiver had already paid the sender before for the assessed payment.",
+     "source_id": "shap:150240_812D22980"
+    }
+   ],
+   "narrative": "The account shows a clear loop-based pattern, with 3 two-step cycles and 2 three-step cycles. The alert records 3 flagged payments, while 11 flagged payments touch the account in the broader neighborhood. The risk score of 5.32 and evidence of reciprocal payment activity support escalation.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "150240_812D22980",
+     "risk_score": 5.32,
+     "suspected_typology": "CYCLE",
+     "evidence": [
+      {
+       "claim": "The alert assigns the account a risk score of 5.32.",
+       "source_id": "alert:150240_812D22980"
+      },
+      {
+       "claim": "The alert records 3 flagged payments.",
+       "source_id": "alert:150240_812D22980"
+      },
+      {
+       "claim": "The network contains 3 two-step cycles and 2 three-step cycles.",
+       "source_id": "subgraph:150240_812D22980"
+      },
+      {
+       "claim": "11 flagged payments touch the account in the broader neighborhood.",
+       "source_id": "subgraph:150240_812D22980"
+      },
+      {
+       "claim": "3 counterparties made payments in both directions with the account.",
+       "source_id": "subgraph:150240_812D22980"
+      },
+      {
+       "claim": "The receiver had already paid the sender before for the assessed payment.",
+       "source_id": "shap:150240_812D22980"
+      }
+     ],
+     "narrative": "The account shows a clear loop-based pattern, with 3 two-step cycles and 2 three-step cycles. The alert records 3 flagged payments, while 11 flagged payments touch the account in the broader neighborhood. The risk score of 5.32 and evidence of reciprocal payment activity support escalation.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 11.22,
+  "tokens": 4706,
+  "generated_at": "2026-10-20 17:46 UTC",
+  "total_latency_s": 11.24
+ },
+ "21611_808D6F2D0": {
+  "summary": {
+   "account_id": "21611_808D6F2D0",
+   "risk_score": 5.19,
+   "suspected_typology": "FAN-OUT",
+   "evidence": [
+    {
+     "claim": "The account sent payments to 15 different receivers.",
+     "source_id": "subgraph:21611_808D6F2D0"
+    },
+    {
+     "claim": "The account received payments from 3 different senders.",
+     "source_id": "subgraph:21611_808D6F2D0"
+    },
+    {
+     "claim": "The network contains 1 two-step cycle involving the account.",
+     "source_id": "subgraph:21611_808D6F2D0"
+    },
+    {
+     "claim": "8 payments were flagged by the blended risk assessment.",
+     "source_id": "alert:21611_808D6F2D0"
+    },
+    {
+     "claim": "An ACH transfer raised risk, while the sender's time since previous account activity was 0.0 hours.",
+     "source_id": "shap:21611_808D6F2D0"
+    }
+   ],
+   "narrative": "The account shows a broad outbound pattern, paying 15 different receivers while receiving from 3 different senders. The alert identifies 8 flagged payments, and the network contains 1 two-step cycle. The ACH transfer and 0.0 hours of prior sender activity are risk-raising signals, supporting enhanced review.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "21611_808D6F2D0",
+     "risk_score": 5.19,
+     "suspected_typology": "FAN-OUT",
+     "evidence": [
+      {
+       "claim": "The account sent payments to 15 different receivers.",
+       "source_id": "subgraph:21611_808D6F2D0"
+      },
+      {
+       "claim": "The account received payments from 3 different senders.",
+       "source_id": "subgraph:21611_808D6F2D0"
+      },
+      {
+       "claim": "The network contains 1 two-step cycle involving the account.",
+       "source_id": "subgraph:21611_808D6F2D0"
+      },
+      {
+       "claim": "8 payments were flagged by the blended risk assessment.",
+       "source_id": "alert:21611_808D6F2D0"
+      },
+      {
+       "claim": "An ACH transfer raised risk, while the sender's time since previous account activity was 0.0 hours.",
+       "source_id": "shap:21611_808D6F2D0"
+      }
+     ],
+     "narrative": "The account shows a broad outbound pattern, paying 15 different receivers while receiving from 3 different senders. The alert identifies 8 flagged payments, and the network contains 1 two-step cycle. The ACH transfer and 0.0 hours of prior sender activity are risk-raising signals, supporting enhanced review.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 9.02,
+  "tokens": 5009,
+  "generated_at": "2026-10-20 17:46 UTC",
+  "total_latency_s": 9.03
+ },
+ "222965_80EFDDBB0": {
+  "summary": {
+   "account_id": "222965_80EFDDBB0",
+   "risk_score": 5.58,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account has a blend risk score of 5.58 and is ranked 3 in the alert queue.",
+     "source_id": "alert:222965_80EFDDBB0"
+    },
+    {
+     "claim": "The alert identifies 1 flagged payment for the account.",
+     "source_id": "alert:222965_80EFDDBB0"
+    },
+    {
+     "claim": "The payment network shows 1 distinct sender and 1 distinct receiver, with 0 counterparties connected in both directions.",
+     "source_id": "subgraph:222965_80EFDDBB0"
+    },
+    {
+     "claim": "The network shows 0 two-step cycles and 0 three-step cycles.",
+     "source_id": "subgraph:222965_80EFDDBB0"
+    },
+    {
+     "claim": "The flagged payment was made by ACH transfer, with the sender having 0.0 hours since the account's previous activity.",
+     "source_id": "shap:222965_80EFDDBB0"
+    },
+    {
+     "claim": "The most recent received payments repeatedly came from account 70_1004286F0.",
+     "source_id": "history:222965_80EFDDBB0"
+    }
+   ],
+   "narrative": "The account has a blend risk score of 5.58 and 1 flagged payment, with the ACH transfer and sender timing identified as risk-raising factors. The observed network does not show fan-in, fan-out, circular, or layered structure, and the repeated incoming payments came from a single counterparty. The signals therefore support enhanced review but do not establish a clear suspicious typology.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "222965_80EFDDBB0",
+     "risk_score": 5.58,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account has a blend risk score of 5.58 and is ranked 3 in the alert queue.",
+       "source_id": "alert:222965_80EFDDBB0"
+      },
+      {
+       "claim": "The alert identifies 1 flagged payment for the account.",
+       "source_id": "alert:222965_80EFDDBB0"
+      },
+      {
+       "claim": "The payment network shows 1 distinct sender and 1 distinct receiver, with 0 counterparties connected in both directions.",
+       "source_id": "subgraph:222965_80EFDDBB0"
+      },
+      {
+       "claim": "The network shows 0 two-step cycles and 0 three-step cycles.",
+       "source_id": "subgraph:222965_80EFDDBB0"
+      },
+      {
+       "claim": "The flagged payment was made by ACH transfer, with the sender having 0.0 hours since the account's previous activity.",
+       "source_id": "shap:222965_80EFDDBB0"
+      },
+      {
+       "claim": "The most recent received payments repeatedly came from account 70_1004286F0.",
+       "source_id": "history:222965_80EFDDBB0"
+      }
+     ],
+     "narrative": "The account has a blend risk score of 5.58 and 1 flagged payment, with the ACH transfer and sender timing identified as risk-raising factors. The observed network does not show fan-in, fan-out, circular, or layered structure, and the repeated incoming payments came from a single counterparty. The signals therefore support enhanced review but do not establish a clear suspicious typology.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 7.51,
+  "tokens": 4486,
+  "generated_at": "2026-10-20 17:47 UTC",
+  "total_latency_s": 7.53
+ },
+ "11_800924840": {
+  "summary": {
+   "account_id": "11_800924840",
+   "risk_score": 5.58,
+   "suspected_typology": "GATHER-SCATTER",
+   "evidence": [
+    {
+     "claim": "15 different accounts pay the account, while it pays 10 different accounts.",
+     "source_id": "subgraph:11_800924840"
+    },
+    {
+     "claim": "The account sent 77 direct payments and received 22 direct payments.",
+     "source_id": "subgraph:11_800924840"
+    },
+    {
+     "claim": "The alert identifies 9 flagged payments.",
+     "source_id": "alert:11_800924840"
+    },
+    {
+     "claim": "There are 14 flagged payments touching the account and 14 flagged payments in its neighbourhood.",
+     "source_id": "subgraph:11_800924840"
+    },
+    {
+     "claim": "Paid by ACH transfer raises risk for the examined payment by 2.7.",
+     "source_id": "shap:11_800924840"
+    }
+   ],
+   "narrative": "The account receives payments from 15 different accounts and distributes payments to 10 different accounts, indicating a gather-and-scatter pattern. The alert identifies 9 flagged payments, while the broader neighbourhood contains 14 flagged payments touching the account. ACH payment activity is a stated risk-raising driver, so the combined network and payment signals support escalation.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "11_800924840",
+     "risk_score": 5.58,
+     "suspected_typology": "GATHER-SCATTER",
+     "evidence": [
+      {
+       "claim": "15 different accounts pay the account, while it pays 10 different accounts.",
+       "source_id": "subgraph:11_800924840"
+      },
+      {
+       "claim": "The account sent 77 direct payments and received 22 direct payments.",
+       "source_id": "subgraph:11_800924840"
+      },
+      {
+       "claim": "The alert identifies 9 flagged payments.",
+       "source_id": "alert:11_800924840"
+      },
+      {
+       "claim": "There are 14 flagged payments touching the account and 14 flagged payments in its neighbourhood.",
+       "source_id": "subgraph:11_800924840"
+      },
+      {
+       "claim": "Paid by ACH transfer raises risk for the examined payment by 2.7.",
+       "source_id": "shap:11_800924840"
+      }
+     ],
+     "narrative": "The account receives payments from 15 different accounts and distributes payments to 10 different accounts, indicating a gather-and-scatter pattern. The alert identifies 9 flagged payments, while the broader neighbourhood contains 14 flagged payments touching the account. ACH payment activity is a stated risk-raising driver, so the combined network and payment signals support escalation.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 6.47,
+  "tokens": 4262,
+  "generated_at": "2026-10-20 17:47 UTC",
+  "total_latency_s": 6.48
+ },
+ "9371_8043A0FB0": {
+  "summary": {
+   "account_id": "9371_8043A0FB0",
+   "risk_score": 5.57,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account has 17 distinct direct receivers.",
+     "source_id": "subgraph:9371_8043A0FB0"
+    },
+    {
+     "claim": "The account has 11 distinct direct senders.",
+     "source_id": "subgraph:9371_8043A0FB0"
+    },
+    {
+     "claim": "No two-step cycles were identified.",
+     "source_id": "subgraph:9371_8043A0FB0"
+    },
+    {
+     "claim": "The blend assessment reports rank 5.",
+     "source_id": "alert:9371_8043A0FB0"
+    },
+    {
+     "claim": "The blend assessment identifies 1 flagged payment.",
+     "source_id": "alert:9371_8043A0FB0"
+    },
+    {
+     "claim": "The payment used ACH transfer.",
+     "source_id": "shap:9371_8043A0FB0"
+    }
+   ],
+   "narrative": "The blend assessment reports a risk score of 5.57, rank 5, and 1 flagged payment. The network shows 17 distinct receivers and 11 distinct senders, with no two-step or three-step cycles identified, so it does not establish a single dominant laundering structure. The ACH payment and several timing and activity factors raised risk, supporting enhanced review rather than immediate escalation.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "9371_8043A0FB0",
+     "risk_score": 5.57,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account has 17 distinct direct receivers.",
+       "source_id": "subgraph:9371_8043A0FB0"
+      },
+      {
+       "claim": "The account has 11 distinct direct senders.",
+       "source_id": "subgraph:9371_8043A0FB0"
+      },
+      {
+       "claim": "No two-step cycles were identified.",
+       "source_id": "subgraph:9371_8043A0FB0"
+      },
+      {
+       "claim": "The blend assessment reports rank 5.",
+       "source_id": "alert:9371_8043A0FB0"
+      },
+      {
+       "claim": "The blend assessment identifies 1 flagged payment.",
+       "source_id": "alert:9371_8043A0FB0"
+      },
+      {
+       "claim": "The payment used ACH transfer.",
+       "source_id": "shap:9371_8043A0FB0"
+      }
+     ],
+     "narrative": "The blend assessment reports a risk score of 5.57, rank 5, and 1 flagged payment. The network shows 17 distinct receivers and 11 distinct senders, with no two-step or three-step cycles identified, so it does not establish a single dominant laundering structure. The ACH payment and several timing and activity factors raised risk, supporting enhanced review rather than immediate escalation.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 15.49,
+  "tokens": 5213,
+  "generated_at": "2026-10-20 17:47 UTC",
+  "total_latency_s": 15.5
+ },
+ "15010_80362C640": {
+  "summary": {
+   "account_id": "15010_80362C640",
+   "risk_score": 5.03,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account received 13526.09 Euro by ACH transfer, and this payment was flagged.",
+     "source_id": "history:15010_80362C640"
+    },
+    {
+     "claim": "The payment history shows 5 sent payments and 15 received payments.",
+     "source_id": "history:15010_80362C640"
+    },
+    {
+     "claim": "The payment network shows 2 different senders and 2 different receivers.",
+     "source_id": "subgraph:15010_80362C640"
+    },
+    {
+     "claim": "The payment network shows 0 two-step cycles and 0 three-step cycles.",
+     "source_id": "subgraph:15010_80362C640"
+    },
+    {
+     "claim": "The most recent flagged payment was made by ACH transfer, which raised the payment's risk.",
+     "source_id": "shap:15010_80362C640"
+    }
+   ],
+   "narrative": "The account received 13526.09 Euro by ACH transfer, and that payment was flagged. The network does not show a clear fan-in, fan-out, or cycle pattern, and the account's activity is concentrated in repeated payments with one counterparty. The available signals are mixed, so enhanced review is appropriate.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "15010_80362C640",
+     "risk_score": 5.03,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account received 13526.09 Euro by ACH transfer, and this payment was flagged.",
+       "source_id": "history:15010_80362C640"
+      },
+      {
+       "claim": "The payment history shows 5 sent payments and 15 received payments.",
+       "source_id": "history:15010_80362C640"
+      },
+      {
+       "claim": "The payment network shows 2 different senders and 2 different receivers.",
+       "source_id": "subgraph:15010_80362C640"
+      },
+      {
+       "claim": "The payment network shows 0 two-step cycles and 0 three-step cycles.",
+       "source_id": "subgraph:15010_80362C640"
+      },
+      {
+       "claim": "The most recent flagged payment was made by ACH transfer, which raised the payment's risk.",
+       "source_id": "shap:15010_80362C640"
+      }
+     ],
+     "narrative": "The account received 13526.09 Euro by ACH transfer, and that payment was flagged. The network does not show a clear fan-in, fan-out, or cycle pattern, and the account's activity is concentrated in repeated payments with one counterparty. The available signals are mixed, so enhanced review is appropriate.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 7.6,
+  "tokens": 4304,
+  "generated_at": "2026-10-20 17:47 UTC",
+  "total_latency_s": 7.61
+ },
+ "9665_804234190": {
+  "summary": {
+   "account_id": "9665_804234190",
+   "risk_score": 5.03,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "4 different accounts pay the account under investigation.",
+     "source_id": "subgraph:9665_804234190"
+    },
+    {
+     "claim": "The account pays 1 distinct receiver.",
+     "source_id": "subgraph:9665_804234190"
+    },
+    {
+     "claim": "The account has 24 direct payments received and 3 direct payments sent.",
+     "source_id": "subgraph:9665_804234190"
+    },
+    {
+     "claim": "There are 0 two-step cycles, 0 three-step cycles, and 0 counterparties involved in both directions.",
+     "source_id": "subgraph:9665_804234190"
+    },
+    {
+     "claim": "The alert identifies 1 flagged payment and gives the account a blend risk score of 5.03.",
+     "source_id": "alert:9665_804234190"
+    },
+    {
+     "claim": "Payment by ACH raised the risk score by 2.88.",
+     "source_id": "shap:9665_804234190"
+    }
+   ],
+   "narrative": "The account shows a fan-in pattern: 4 different senders pay it, while it pays 1 distinct receiver. There are 0 two-step cycles, 0 three-step cycles, and 0 counterparties involved in both directions, so no loop or layered structure is evident. The account has 1 flagged payment and a blend risk score of 5.03, while the ACH payment increased risk by 2.88; the mixed signals support enhanced review rather than immediate escalation.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "9665_804234190",
+     "risk_score": 5.03,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "4 different accounts pay the account under investigation.",
+       "source_id": "subgraph:9665_804234190"
+      },
+      {
+       "claim": "The account pays 1 distinct receiver.",
+       "source_id": "subgraph:9665_804234190"
+      },
+      {
+       "claim": "The account has 24 direct payments received and 3 direct payments sent.",
+       "source_id": "subgraph:9665_804234190"
+      },
+      {
+       "claim": "There are 0 two-step cycles, 0 three-step cycles, and 0 counterparties involved in both directions.",
+       "source_id": "subgraph:9665_804234190"
+      },
+      {
+       "claim": "The alert identifies 1 flagged payment and gives the account a blend risk score of 5.03.",
+       "source_id": "alert:9665_804234190"
+      },
+      {
+       "claim": "Payment by ACH raised the risk score by 2.88.",
+       "source_id": "shap:9665_804234190"
+      }
+     ],
+     "narrative": "The account shows a fan-in pattern: 4 different senders pay it, while it pays 1 distinct receiver. There are 0 two-step cycles, 0 three-step cycles, and 0 counterparties involved in both directions, so no loop or layered structure is evident. The account has 1 flagged payment and a blend risk score of 5.03, while the ACH payment increased risk by 2.88; the mixed signals support enhanced review rather than immediate escalation.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 9.7,
+  "tokens": 4741,
+  "generated_at": "2026-10-20 17:47 UTC",
+  "total_latency_s": 9.71
+ },
+ "23691_8021353D0": {
+  "summary": {
+   "account_id": "23691_8021353D0",
+   "risk_score": 4.97,
+   "suspected_typology": "CYCLE",
+   "evidence": [
+    {
+     "claim": "The account has a risk score of 4.97 and a rank of 99 in the alert output.",
+     "source_id": "alert:23691_8021353D0"
+    },
+    {
+     "claim": "The alert output identifies 6 flagged payments.",
+     "source_id": "alert:23691_8021353D0"
+    },
+    {
+     "claim": "The network contains 1 two-step cycle.",
+     "source_id": "subgraph:23691_8021353D0"
+    },
+    {
+     "claim": "There is 1 counterparty with payments in both directions.",
+     "source_id": "subgraph:23691_8021353D0"
+    },
+    {
+     "claim": "Payment by ACH transfer raises risk with a push of 2.36.",
+     "source_id": "shap:23691_8021353D0"
+    },
+    {
+     "claim": "The account history contains 8 flagged payments.",
+     "source_id": "history:23691_8021353D0"
+    }
+   ],
+   "narrative": "The account has a risk score of 4.97, a rank of 99, and 6 flagged payments in the alert output. Its network contains 1 two-step cycle, and the history shows repeated payments both to and from 15231_80266F880. ACH payment and prior reciprocal activity are identified as risk-raising drivers, supporting escalation for a detailed review.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "23691_8021353D0",
+     "risk_score": 4.97,
+     "suspected_typology": "CYCLE",
+     "evidence": [
+      {
+       "claim": "The account has a risk score of 4.97 and a rank of 99 in the alert output.",
+       "source_id": "alert:23691_8021353D0"
+      },
+      {
+       "claim": "The alert output identifies 6 flagged payments.",
+       "source_id": "alert:23691_8021353D0"
+      },
+      {
+       "claim": "The network contains 1 two-step cycle.",
+       "source_id": "subgraph:23691_8021353D0"
+      },
+      {
+       "claim": "There is 1 counterparty with payments in both directions.",
+       "source_id": "subgraph:23691_8021353D0"
+      },
+      {
+       "claim": "Payment by ACH transfer raises risk with a push of 2.36.",
+       "source_id": "shap:23691_8021353D0"
+      },
+      {
+       "claim": "The account history contains 8 flagged payments.",
+       "source_id": "history:23691_8021353D0"
+      }
+     ],
+     "narrative": "The account has a risk score of 4.97, a rank of 99, and 6 flagged payments in the alert output. Its network contains 1 two-step cycle, and the history shows repeated payments both to and from 15231_80266F880. ACH payment and prior reciprocal activity are identified as risk-raising drivers, supporting escalation for a detailed review.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 7.25,
+  "tokens": 4459,
+  "generated_at": "2026-10-20 17:48 UTC",
+  "total_latency_s": 7.27
+ },
+ "222697_8087F4940": {
+  "summary": {
+   "account_id": "222697_8087F4940",
+   "risk_score": 5.61,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "The account ranks 1 in the alert queue with a risk score of 5.61 and 1 flagged payment.",
+     "source_id": "alert:222697_8087F4940"
+    },
+    {
+     "claim": "The account receives payments from 5 different senders and pays only 1 distinct receiver.",
+     "source_id": "subgraph:222697_8087F4940"
+    },
+    {
+     "claim": "There are 7 flagged payments in the neighbourhood and 2 flagged payments touching the account.",
+     "source_id": "subgraph:222697_8087F4940"
+    },
+    {
+     "claim": "The two-step and three-step cycle counts are both 0.",
+     "source_id": "subgraph:222697_8087F4940"
+    },
+    {
+     "claim": "The ACH payment is the main risk-raising driver with a push of 2.88.",
+     "source_id": "shap:222697_8087F4940"
+    },
+    {
+     "claim": "The largest payment was 17049.76, and it was sent by the account.",
+     "source_id": "history:222697_8087F4940"
+    }
+   ],
+   "narrative": "The account has a concentrated inbound pattern, with 5 different senders directing payments toward only 1 distinct receiver. Its rank of 1, risk score of 5.61, flagged payment activity, and risk-raising ACH drivers support escalation. The absence of detected cycles reduces the likelihood of a loop, but does not explain the concentrated inbound flow.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "222697_8087F4940",
+     "risk_score": 5.61,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "The account ranks 1 in the alert queue with a risk score of 5.61 and 1 flagged payment.",
+       "source_id": "alert:222697_8087F4940"
+      },
+      {
+       "claim": "The account receives payments from 5 different senders and pays only 1 distinct receiver.",
+       "source_id": "subgraph:222697_8087F4940"
+      },
+      {
+       "claim": "There are 7 flagged payments in the neighbourhood and 2 flagged payments touching the account.",
+       "source_id": "subgraph:222697_8087F4940"
+      },
+      {
+       "claim": "The two-step and three-step cycle counts are both 0.",
+       "source_id": "subgraph:222697_8087F4940"
+      },
+      {
+       "claim": "The ACH payment is the main risk-raising driver with a push of 2.88.",
+       "source_id": "shap:222697_8087F4940"
+      },
+      {
+       "claim": "The largest payment was 17049.76, and it was sent by the account.",
+       "source_id": "history:222697_8087F4940"
+      }
+     ],
+     "narrative": "The account has a concentrated inbound pattern, with 5 different senders directing payments toward only 1 distinct receiver. Its rank of 1, risk score of 5.61, flagged payment activity, and risk-raising ACH drivers support escalation. The absence of detected cycles reduces the likelihood of a loop, but does not explain the concentrated inbound flow.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 8.37,
+  "tokens": 4510,
+  "generated_at": "2026-10-20 17:48 UTC",
+  "total_latency_s": 8.39
+ },
+ "15085_81121FAB0": {
+  "summary": {
+   "account_id": "15085_81121FAB0",
+   "risk_score": 5.61,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "The account received payments from 15 different senders.",
+     "source_id": "subgraph:15085_81121FAB0"
+    },
+    {
+     "claim": "The account paid only 1 distinct receiver.",
+     "source_id": "subgraph:15085_81121FAB0"
+    },
+    {
+     "claim": "The blend model ranked the account 2 with a risk score of 5.61.",
+     "source_id": "alert:15085_81121FAB0"
+    },
+    {
+     "claim": "The blend model flagged 6 payments.",
+     "source_id": "alert:15085_81121FAB0"
+    },
+    {
+     "claim": "Payment by ACH transfer was the strongest risk-raising factor for the most recent payment, with a push of 2.88.",
+     "source_id": "shap:15085_81121FAB0"
+    },
+    {
+     "claim": "The largest payment was 17049.76, and it was flagged by the blend model.",
+     "source_id": "history:15085_81121FAB0"
+    }
+   ],
+   "narrative": "The account received payments from 15 different senders while paying only 1 distinct receiver, indicating a fan-in pattern. The blend model placed it at rank 2 with a risk score of 5.61 and 6 flagged payments. The largest payment was 17049.76, and the strongest risk-raising factor was payment by ACH transfer.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "15085_81121FAB0",
+     "risk_score": 5.61,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "The account received payments from 15 different senders.",
+       "source_id": "subgraph:15085_81121FAB0"
+      },
+      {
+       "claim": "The account paid only 1 distinct receiver.",
+       "source_id": "subgraph:15085_81121FAB0"
+      },
+      {
+       "claim": "The blend model ranked the account 2 with a risk score of 5.61.",
+       "source_id": "alert:15085_81121FAB0"
+      },
+      {
+       "claim": "The blend model flagged 6 payments.",
+       "source_id": "alert:15085_81121FAB0"
+      },
+      {
+       "claim": "Payment by ACH transfer was the strongest risk-raising factor for the most recent payment, with a push of 2.88.",
+       "source_id": "shap:15085_81121FAB0"
+      },
+      {
+       "claim": "The largest payment was 17049.76, and it was flagged by the blend model.",
+       "source_id": "history:15085_81121FAB0"
+      }
+     ],
+     "narrative": "The account received payments from 15 different senders while paying only 1 distinct receiver, indicating a fan-in pattern. The blend model placed it at rank 2 with a risk score of 5.61 and 6 flagged payments. The largest payment was 17049.76, and the strongest risk-raising factor was payment by ACH transfer.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 4.68,
+  "tokens": 4401,
+  "generated_at": "2026-10-20 17:48 UTC",
+  "total_latency_s": 4.69
+ },
+ "220_800118660": {
+  "summary": {
+   "account_id": "220_800118660",
+   "risk_score": 5.54,
+   "suspected_typology": "CYCLE",
+   "evidence": [
+    {
+     "claim": "The account has a risk score of 5.54, a rank of 7, and 1 flagged payment.",
+     "source_id": "alert:220_800118660"
+    },
+    {
+     "claim": "The account has 9 different accounts paying it and 4 different accounts it pays.",
+     "source_id": "subgraph:220_800118660"
+    },
+    {
+     "claim": "The network contains 1 two-step cycle and 0 three-step cycles.",
+     "source_id": "subgraph:220_800118660"
+    },
+    {
+     "claim": "The surrounding network contains 6 flagged payments, with 1 flagged payment touching the account.",
+     "source_id": "subgraph:220_800118660"
+    },
+    {
+     "claim": "The most recent payment was received by ACH transfer in the amount of 17840.31 and was flagged with a score of 5.54.",
+     "source_id": "history:220_800118660"
+    },
+    {
+     "claim": "The payment was made by ACH transfer, and this factor raises risk by 2.79.",
+     "source_id": "shap:220_800118660"
+    }
+   ],
+   "narrative": "The account has a rank of 7, a risk score of 5.54, and 1 flagged payment. The network shows 1 two-step cycle, 9 different accounts paying the account, and 6 flagged payments in the surrounding neighbourhood. The most recent payment was an ACH transfer of 17840.31, and the ACH and timing factors were identified as raising risk.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "220_800118660",
+     "risk_score": 5.54,
+     "suspected_typology": "CYCLE",
+     "evidence": [
+      {
+       "claim": "The account has a risk score of 5.54, a rank of 7, and 1 flagged payment.",
+       "source_id": "alert:220_800118660"
+      },
+      {
+       "claim": "The account has 9 different accounts paying it and 4 different accounts it pays.",
+       "source_id": "subgraph:220_800118660"
+      },
+      {
+       "claim": "The network contains 1 two-step cycle and 0 three-step cycles.",
+       "source_id": "subgraph:220_800118660"
+      },
+      {
+       "claim": "The surrounding network contains 6 flagged payments, with 1 flagged payment touching the account.",
+       "source_id": "subgraph:220_800118660"
+      },
+      {
+       "claim": "The most recent payment was received by ACH transfer in the amount of 17840.31 and was flagged with a score of 5.54.",
+       "source_id": "history:220_800118660"
+      },
+      {
+       "claim": "The payment was made by ACH transfer, and this factor raises risk by 2.79.",
+       "source_id": "shap:220_800118660"
+      }
+     ],
+     "narrative": "The account has a rank of 7, a risk score of 5.54, and 1 flagged payment. The network shows 1 two-step cycle, 9 different accounts paying the account, and 6 flagged payments in the surrounding neighbourhood. The most recent payment was an ACH transfer of 17840.31, and the ACH and timing factors were identified as raising risk.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 7.5,
+  "tokens": 4444,
+  "generated_at": "2026-10-20 17:48 UTC",
+  "total_latency_s": 7.51
+ },
+ "11_8006345A0": {
+  "summary": {
+   "account_id": "11_8006345A0",
+   "risk_score": 5.33,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account ranked 17 in the alert results.",
+     "source_id": "alert:11_8006345A0"
+    },
+    {
+     "claim": "1 payment was flagged by the blended risk assessment.",
+     "source_id": "alert:11_8006345A0"
+    },
+    {
+     "claim": "The account sent 3 direct payments and received 3 direct payments.",
+     "source_id": "subgraph:11_8006345A0"
+    },
+    {
+     "claim": "The account had 1 distinct sender and 1 distinct receiver.",
+     "source_id": "subgraph:11_8006345A0"
+    },
+    {
+     "claim": "No two-step or three-step cycles were detected.",
+     "source_id": "subgraph:11_8006345A0"
+    },
+    {
+     "claim": "The most recent payment of 19496.68 US Dollar used ACH and raised the risk assessment by 2.85.",
+     "source_id": "shap:11_8006345A0"
+    }
+   ],
+   "narrative": "The account has a blended risk score of 5.33, with 1 payment flagged. Its network activity shows 1 distinct sender and 1 distinct receiver, and no cycles were detected, so no specific transactional typology is established. ACH payment activity and the sender's 0.0 hours since previous activity increased the risk assessment, warranting enhanced review.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "11_8006345A0",
+     "risk_score": 5.33,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account ranked 17 in the alert results.",
+       "source_id": "alert:11_8006345A0"
+      },
+      {
+       "claim": "1 payment was flagged by the blended risk assessment.",
+       "source_id": "alert:11_8006345A0"
+      },
+      {
+       "claim": "The account sent 3 direct payments and received 3 direct payments.",
+       "source_id": "subgraph:11_8006345A0"
+      },
+      {
+       "claim": "The account had 1 distinct sender and 1 distinct receiver.",
+       "source_id": "subgraph:11_8006345A0"
+      },
+      {
+       "claim": "No two-step or three-step cycles were detected.",
+       "source_id": "subgraph:11_8006345A0"
+      },
+      {
+       "claim": "The most recent payment of 19496.68 US Dollar used ACH and raised the risk assessment by 2.85.",
+       "source_id": "shap:11_8006345A0"
+      }
+     ],
+     "narrative": "The account has a blended risk score of 5.33, with 1 payment flagged. Its network activity shows 1 distinct sender and 1 distinct receiver, and no cycles were detected, so no specific transactional typology is established. ACH payment activity and the sender's 0.0 hours since previous activity increased the risk assessment, warranting enhanced review.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 18.53,
+  "tokens": 3304,
+  "generated_at": "2026-10-20 17:49 UTC",
+  "total_latency_s": 18.54
+ },
+ "11974_800FC2A60": {
+  "summary": {
+   "account_id": "11974_800FC2A60",
+   "risk_score": 5.33,
+   "suspected_typology": "FAN-OUT",
+   "evidence": [
+    {
+     "claim": "The account sent payments to 7 different receivers.",
+     "source_id": "subgraph:11974_800FC2A60"
+    },
+    {
+     "claim": "The account received payments from 3 different senders.",
+     "source_id": "subgraph:11974_800FC2A60"
+    },
+    {
+     "claim": "The account made 82 direct payments and received 18 direct payments.",
+     "source_id": "subgraph:11974_800FC2A60"
+    },
+    {
+     "claim": "The most recent flagged payment was received by ACH transfer for 19496.68.",
+     "source_id": "history:11974_800FC2A60"
+    },
+    {
+     "claim": "Payment by ACH transfer was the strongest risk-raising factor for the flagged payment.",
+     "source_id": "shap:11974_800FC2A60"
+    }
+   ],
+   "narrative": "The account's risk score is 5.33, and 1 payment was flagged. Its payment activity is predominantly outward, with more distinct receivers than senders and no detected loops. The flagged incoming ACH payment and several risk-raising payment characteristics warrant closer review, but the network does not show a cycle or a strong layered pattern.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "11974_800FC2A60",
+     "risk_score": 5.33,
+     "suspected_typology": "FAN-OUT",
+     "evidence": [
+      {
+       "claim": "The account sent payments to 7 different receivers.",
+       "source_id": "subgraph:11974_800FC2A60"
+      },
+      {
+       "claim": "The account received payments from 3 different senders.",
+       "source_id": "subgraph:11974_800FC2A60"
+      },
+      {
+       "claim": "The account made 82 direct payments and received 18 direct payments.",
+       "source_id": "subgraph:11974_800FC2A60"
+      },
+      {
+       "claim": "The most recent flagged payment was received by ACH transfer for 19496.68.",
+       "source_id": "history:11974_800FC2A60"
+      },
+      {
+       "claim": "Payment by ACH transfer was the strongest risk-raising factor for the flagged payment.",
+       "source_id": "shap:11974_800FC2A60"
+      }
+     ],
+     "narrative": "The account's risk score is 5.33, and 1 payment was flagged. Its payment activity is predominantly outward, with more distinct receivers than senders and no detected loops. The flagged incoming ACH payment and several risk-raising payment characteristics warrant closer review, but the network does not show a cycle or a strong layered pattern.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 8.14,
+  "tokens": 4469,
+  "generated_at": "2026-10-20 17:49 UTC",
+  "total_latency_s": 8.15
+ },
+ "24515_80254C330": {
+  "summary": {
+   "account_id": "24515_80254C330",
+   "risk_score": 5.31,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The alert ranked the account 21.",
+     "source_id": "alert:24515_80254C330"
+    },
+    {
+     "claim": "The alert identified 1 flagged payment.",
+     "source_id": "alert:24515_80254C330"
+    },
+    {
+     "claim": "The account had 3 distinct senders and 3 distinct receivers.",
+     "source_id": "subgraph:24515_80254C330"
+    },
+    {
+     "claim": "The review found 0 two-step cycles, 0 three-step cycles, and 0 counterparties with payments in both directions.",
+     "source_id": "subgraph:24515_80254C330"
+    },
+    {
+     "claim": "The transaction history contained 17 received payments, 3 sent payments, and 2 flagged payments.",
+     "source_id": "history:24515_80254C330"
+    },
+    {
+     "claim": "The riskiest payment was an ACH transfer, and the sender had 0.0 hours since the account's previous activity.",
+     "source_id": "shap:24515_80254C330"
+    }
+   ],
+   "narrative": "The alert assigned a risk score of 5.31 and identified 1 flagged payment, with additional flagged activity appearing in the payment history. The direct network is balanced between 3 distinct senders and 3 distinct receivers, with 0 two-step cycles, 0 three-step cycles, and 0 counterparties active in both directions. The evidence does not establish a clear network pattern, so enhanced review is appropriate.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "24515_80254C330",
+     "risk_score": 5.31,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The alert ranked the account 21.",
+       "source_id": "alert:24515_80254C330"
+      },
+      {
+       "claim": "The alert identified 1 flagged payment.",
+       "source_id": "alert:24515_80254C330"
+      },
+      {
+       "claim": "The account had 3 distinct senders and 3 distinct receivers.",
+       "source_id": "subgraph:24515_80254C330"
+      },
+      {
+       "claim": "The review found 0 two-step cycles, 0 three-step cycles, and 0 counterparties with payments in both directions.",
+       "source_id": "subgraph:24515_80254C330"
+      },
+      {
+       "claim": "The transaction history contained 17 received payments, 3 sent payments, and 2 flagged payments.",
+       "source_id": "history:24515_80254C330"
+      },
+      {
+       "claim": "The riskiest payment was an ACH transfer, and the sender had 0.0 hours since the account's previous activity.",
+       "source_id": "shap:24515_80254C330"
+      }
+     ],
+     "narrative": "The alert assigned a risk score of 5.31 and identified 1 flagged payment, with additional flagged activity appearing in the payment history. The direct network is balanced between 3 distinct senders and 3 distinct receivers, with 0 two-step cycles, 0 three-step cycles, and 0 counterparties active in both directions. The evidence does not establish a clear network pattern, so enhanced review is appropriate.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 11.84,
+  "tokens": 4980,
+  "generated_at": "2026-10-20 17:49 UTC",
+  "total_latency_s": 11.85
+ },
+ "312002_805B959D0": {
+  "summary": {
+   "account_id": "312002_805B959D0",
+   "risk_score": 4.56,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The alert identified 1 flagged payment.",
+     "source_id": "alert:312002_805B959D0"
+    },
+    {
+     "claim": "The account sent 6 direct payments and received 3 direct payments.",
+     "source_id": "subgraph:312002_805B959D0"
+    },
+    {
+     "claim": "The account paid 2 different accounts and received payments from 0 different accounts.",
+     "source_id": "subgraph:312002_805B959D0"
+    },
+    {
+     "claim": "There were 0 two-step cycles and 0 three-step cycles.",
+     "source_id": "subgraph:312002_805B959D0"
+    },
+    {
+     "claim": "The payment used ACH, and the sender had 0.0 hours since the account's previous activity; these factors increased risk.",
+     "source_id": "shap:312002_805B959D0"
+    }
+   ],
+   "narrative": "The account has a risk score of 4.56 and 1 flagged payment. Its activity is concentrated in outgoing ACH payments, with 2 different receivers, no incoming senders, and no detected loops, so no specific network typology is established. The evidence supports enhanced review rather than a definitive escalation.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "312002_805B959D0",
+     "risk_score": 4.56,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The alert identified 1 flagged payment.",
+       "source_id": "alert:312002_805B959D0"
+      },
+      {
+       "claim": "The account sent 6 direct payments and received 3 direct payments.",
+       "source_id": "subgraph:312002_805B959D0"
+      },
+      {
+       "claim": "The account paid 2 different accounts and received payments from 0 different accounts.",
+       "source_id": "subgraph:312002_805B959D0"
+      },
+      {
+       "claim": "There were 0 two-step cycles and 0 three-step cycles.",
+       "source_id": "subgraph:312002_805B959D0"
+      },
+      {
+       "claim": "The payment used ACH, and the sender had 0.0 hours since the account's previous activity; these factors increased risk.",
+       "source_id": "shap:312002_805B959D0"
+      }
+     ],
+     "narrative": "The account has a risk score of 4.56 and 1 flagged payment. Its activity is concentrated in outgoing ACH payments, with 2 different receivers, no incoming senders, and no detected loops, so no specific network typology is established. The evidence supports enhanced review rather than a definitive escalation.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 9.04,
+  "tokens": 3373,
+  "generated_at": "2026-10-20 17:49 UTC",
+  "total_latency_s": 9.06
+ },
+ "16_8058AF4B0": {
+  "summary": {
+   "account_id": "16_8058AF4B0",
+   "risk_score": 4.47,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "9 different accounts paid the account under investigation.",
+     "source_id": "subgraph:16_8058AF4B0"
+    },
+    {
+     "claim": "The account paid 0 distinct receivers.",
+     "source_id": "subgraph:16_8058AF4B0"
+    },
+    {
+     "claim": "1 flagged payment touched the account.",
+     "source_id": "subgraph:16_8058AF4B0"
+    },
+    {
+     "claim": "The blended risk score was 4.47, above the alert line of 3.89.",
+     "source_id": "alert:16_8058AF4B0"
+    },
+    {
+     "claim": "The most recent payment was an incoming ACH transfer.",
+     "source_id": "history:16_8058AF4B0"
+    }
+   ],
+   "narrative": "The account shows a fan-in pattern, with 9 different senders and 0 distinct outbound receivers. Its blended risk score is 4.47, and 1 payment is flagged. The most recent payment was an incoming ACH transfer, and the payment analysis identified ACH and payment amount as risk-raising features.",
+   "recommended_action": "escalate_SAR"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "16_8058AF4B0",
+     "risk_score": 4.47,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "9 different accounts paid the account under investigation.",
+       "source_id": "subgraph:16_8058AF4B0"
+      },
+      {
+       "claim": "The account paid 0 distinct receivers.",
+       "source_id": "subgraph:16_8058AF4B0"
+      },
+      {
+       "claim": "1 flagged payment touched the account.",
+       "source_id": "subgraph:16_8058AF4B0"
+      },
+      {
+       "claim": "The blended risk score was 4.47, above the alert line of 3.89.",
+       "source_id": "alert:16_8058AF4B0"
+      },
+      {
+       "claim": "The most recent payment was an incoming ACH transfer.",
+       "source_id": "history:16_8058AF4B0"
+      }
+     ],
+     "narrative": "The account shows a fan-in pattern, with 9 different senders and 0 distinct outbound receivers. Its blended risk score is 4.47, and 1 payment is flagged. The most recent payment was an incoming ACH transfer, and the payment analysis identified ACH and payment amount as risk-raising features.",
+     "recommended_action": "escalate_SAR"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 7.44,
+  "tokens": 4254,
+  "generated_at": "2026-10-20 17:49 UTC",
+  "total_latency_s": 7.45
+ },
+ "10_80012FD40": {
+  "summary": {
+   "account_id": "10_80012FD40",
+   "risk_score": 4.47,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "8 different senders paid the account.",
+     "source_id": "subgraph:10_80012FD40"
+    },
+    {
+     "claim": "The account sent payments to 4 different receivers.",
+     "source_id": "subgraph:10_80012FD40"
+    },
+    {
+     "claim": "1 payment was flagged for the account.",
+     "source_id": "alert:10_80012FD40"
+    },
+    {
+     "claim": "The largest payment was 41043106.82.",
+     "source_id": "history:10_80012FD40"
+    },
+    {
+     "claim": "The ACH transfer format raised the payment's risk.",
+     "source_id": "shap:10_80012FD40"
+    }
+   ],
+   "narrative": "The strongest network signal is fan-in, with 8 different senders paying the account compared with 4 different receivers. The account's riskiest payment was 41043106.82, and 1 payment was flagged. The results are mixed across the assessments, so enhanced review is appropriate before escalation.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "10_80012FD40",
+     "risk_score": 4.47,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "8 different senders paid the account.",
+       "source_id": "subgraph:10_80012FD40"
+      },
+      {
+       "claim": "The account sent payments to 4 different receivers.",
+       "source_id": "subgraph:10_80012FD40"
+      },
+      {
+       "claim": "1 payment was flagged for the account.",
+       "source_id": "alert:10_80012FD40"
+      },
+      {
+       "claim": "The largest payment was 41043106.82.",
+       "source_id": "history:10_80012FD40"
+      },
+      {
+       "claim": "The ACH transfer format raised the payment's risk.",
+       "source_id": "shap:10_80012FD40"
+      }
+     ],
+     "narrative": "The strongest network signal is fan-in, with 8 different senders paying the account compared with 4 different receivers. The account's riskiest payment was 41043106.82, and 1 payment was flagged. The results are mixed across the assessments, so enhanced review is appropriate before escalation.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 8.93,
+  "tokens": 4498,
+  "generated_at": "2026-10-20 17:50 UTC",
+  "total_latency_s": 8.94
+ },
+ "331557_810B45D20": {
+  "summary": {
+   "account_id": "331557_810B45D20",
+   "risk_score": 4.46,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account ranked 179 among 200 accounts and received a blend risk score of 4.46.",
+     "source_id": "alert:331557_810B45D20"
+    },
+    {
+     "claim": "The blend assessment flagged 1 payment against an alert line of 3.89.",
+     "source_id": "alert:331557_810B45D20"
+    },
+    {
+     "claim": "The account's history contains 6 sent payments, 0 received payments, and 1 flagged payment.",
+     "source_id": "history:331557_810B45D20"
+    },
+    {
+     "claim": "The visible network has 1 distinct receiver, 0 distinct senders, 0 two-step cycles, and 0 three-step cycles.",
+     "source_id": "subgraph:331557_810B45D20"
+    },
+    {
+     "claim": "Payment by ACH transfer was the largest positive risk contribution, with a push of 2.45.",
+     "source_id": "shap:331557_810B45D20"
+    },
+    {
+     "claim": "The sender's time since the account's previous activity was 0.0 hours and raised risk by 2.14.",
+     "source_id": "shap:331557_810B45D20"
+    }
+   ],
+   "narrative": "The account has a blend risk score of 4.46 and 1 flagged payment, but the visible network is limited and does not establish a clear transactional typology. The network shows 1 distinct receiver, 0 distinct senders, and 0 two- or three-step cycles, while the principal risk-raising features are ACH payment format and sender timing. Given the limited network structure and mixed signals, enhanced review is appropriate.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "331557_810B45D20",
+     "risk_score": 4.46,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account ranked 179 among 200 accounts and received a blend risk score of 4.46.",
+       "source_id": "alert:331557_810B45D20"
+      },
+      {
+       "claim": "The blend assessment flagged 1 payment against an alert line of 3.89.",
+       "source_id": "alert:331557_810B45D20"
+      },
+      {
+       "claim": "The account's history contains 6 sent payments, 0 received payments, and 1 flagged payment.",
+       "source_id": "history:331557_810B45D20"
+      },
+      {
+       "claim": "The visible network has 1 distinct receiver, 0 distinct senders, 0 two-step cycles, and 0 three-step cycles.",
+       "source_id": "subgraph:331557_810B45D20"
+      },
+      {
+       "claim": "Payment by ACH transfer was the largest positive risk contribution, with a push of 2.45.",
+       "source_id": "shap:331557_810B45D20"
+      },
+      {
+       "claim": "The sender's time since the account's previous activity was 0.0 hours and raised risk by 2.14.",
+       "source_id": "shap:331557_810B45D20"
+      }
+     ],
+     "narrative": "The account has a blend risk score of 4.46 and 1 flagged payment, but the visible network is limited and does not establish a clear transactional typology. The network shows 1 distinct receiver, 0 distinct senders, and 0 two- or three-step cycles, while the principal risk-raising features are ACH payment format and sender timing. Given the limited network structure and mixed signals, enhanced review is appropriate.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 9.74,
+  "tokens": 3620,
+  "generated_at": "2026-10-20 17:50 UTC",
+  "total_latency_s": 9.75
+ },
+ "2845_810B45BE0": {
+  "summary": {
+   "account_id": "2845_810B45BE0",
+   "risk_score": 4.46,
+   "suspected_typology": "FAN-IN",
+   "evidence": [
+    {
+     "claim": "The account received payments from 7 different accounts and sent payments to 2 different accounts.",
+     "source_id": "subgraph:2845_810B45BE0"
+    },
+    {
+     "claim": "The assessment ranked the account 180 and assigned it a risk score of 4.46, with 1 payment flagged.",
+     "source_id": "alert:2845_810B45BE0"
+    },
+    {
+     "claim": "The network contains 81 shown payments, including 23 direct payments sent and 43 direct payments received.",
+     "source_id": "subgraph:2845_810B45BE0"
+    },
+    {
+     "claim": "The flagged payment was an ACH transfer of 654.67 US Dollar received from 331557_810B45D20.",
+     "source_id": "history:2845_810B45BE0"
+    },
+    {
+     "claim": "The ACH transfer raised risk, with the sender's time since previous activity shown as 0.0 hours.",
+     "source_id": "shap:2845_810B45BE0"
+    }
+   ],
+   "narrative": "The account shows a fan-in structure, with 7 different accounts paying it and only 2 different accounts receiving its payments. One ACH payment was flagged, and the payment analysis identified the transfer method and sender timing as risk-raising factors. The signals are mixed because the graph assessment flagged no payments while the other two assessments flagged one each, supporting enhanced review rather than immediate escalation.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "2845_810B45BE0",
+     "risk_score": 4.46,
+     "suspected_typology": "FAN-IN",
+     "evidence": [
+      {
+       "claim": "The account received payments from 7 different accounts and sent payments to 2 different accounts.",
+       "source_id": "subgraph:2845_810B45BE0"
+      },
+      {
+       "claim": "The assessment ranked the account 180 and assigned it a risk score of 4.46, with 1 payment flagged.",
+       "source_id": "alert:2845_810B45BE0"
+      },
+      {
+       "claim": "The network contains 81 shown payments, including 23 direct payments sent and 43 direct payments received.",
+       "source_id": "subgraph:2845_810B45BE0"
+      },
+      {
+       "claim": "The flagged payment was an ACH transfer of 654.67 US Dollar received from 331557_810B45D20.",
+       "source_id": "history:2845_810B45BE0"
+      },
+      {
+       "claim": "The ACH transfer raised risk, with the sender's time since previous activity shown as 0.0 hours.",
+       "source_id": "shap:2845_810B45BE0"
+      }
+     ],
+     "narrative": "The account shows a fan-in structure, with 7 different accounts paying it and only 2 different accounts receiving its payments. One ACH payment was flagged, and the payment analysis identified the transfer method and sender timing as risk-raising factors. The signals are mixed because the graph assessment flagged no payments while the other two assessments flagged one each, supporting enhanced review rather than immediate escalation.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 10.28,
+  "tokens": 4780,
+  "generated_at": "2026-10-20 17:50 UTC",
+  "total_latency_s": 10.29
+ },
+ "11974_8057E3520": {
+  "summary": {
+   "account_id": "11974_8057E3520",
+   "risk_score": 4.46,
+   "suspected_typology": "UNCLEAR",
+   "evidence": [
+    {
+     "claim": "The account ranked 181 in the blended assessment.",
+     "source_id": "alert:11974_8057E3520"
+    },
+    {
+     "claim": "The blended assessment flagged 1 payment.",
+     "source_id": "alert:11974_8057E3520"
+    },
+    {
+     "claim": "The account sent 3 direct payments and received 16 direct payments.",
+     "source_id": "subgraph:11974_8057E3520"
+    },
+    {
+     "claim": "The network shows 1 distinct sender and 1 distinct receiver.",
+     "source_id": "subgraph:11974_8057E3520"
+    },
+    {
+     "claim": "No two-step or three-step money loop was found.",
+     "source_id": "subgraph:11974_8057E3520"
+    },
+    {
+     "claim": "The sender's time since previous activity was 0.0 hours, which raised risk.",
+     "source_id": "shap:11974_8057E3520"
+    }
+   ],
+   "narrative": "The account repeatedly received payments from the same counterparty and sent to the same receiver, while the neighborhood showed no cycle. The outgoing ACH payment was flagged, and the ACH transfer and sender inactivity were risk-raising factors. The evidence does not establish a broader multi-party network pattern, so enhanced review is appropriate.",
+   "recommended_action": "enhanced_review"
+  },
+  "verified": true,
+  "drafts": 1,
+  "calls": 5,
+  "retried": false,
+  "rejections": [],
+  "drafts_log": [
+   {
+    "draft": 1,
+    "raw": {
+     "account_id": "11974_8057E3520",
+     "risk_score": 4.46,
+     "suspected_typology": "UNCLEAR",
+     "evidence": [
+      {
+       "claim": "The account ranked 181 in the blended assessment.",
+       "source_id": "alert:11974_8057E3520"
+      },
+      {
+       "claim": "The blended assessment flagged 1 payment.",
+       "source_id": "alert:11974_8057E3520"
+      },
+      {
+       "claim": "The account sent 3 direct payments and received 16 direct payments.",
+       "source_id": "subgraph:11974_8057E3520"
+      },
+      {
+       "claim": "The network shows 1 distinct sender and 1 distinct receiver.",
+       "source_id": "subgraph:11974_8057E3520"
+      },
+      {
+       "claim": "No two-step or three-step money loop was found.",
+       "source_id": "subgraph:11974_8057E3520"
+      },
+      {
+       "claim": "The sender's time since previous activity was 0.0 hours, which raised risk.",
+       "source_id": "shap:11974_8057E3520"
+      }
+     ],
+     "narrative": "The account repeatedly received payments from the same counterparty and sent to the same receiver, while the neighborhood showed no cycle. The outgoing ACH payment was flagged, and the ACH transfer and sender inactivity were risk-raising factors. The evidence does not establish a broader multi-party network pattern, so enhanced review is appropriate.",
+     "recommended_action": "enhanced_review"
+    },
+    "errors": []
+   }
+  ],
+  "errors": [],
+  "provider": "openrouter",
+  "model": "minimax/minimax-m3.1-flash:free",
+  "llm_latency_s": 16.97,
+  "tokens": 5039,
+  "generated_at": "2026-10-20 17:50 UTC",
+  "total_latency_s": 16.99
+ }
+}

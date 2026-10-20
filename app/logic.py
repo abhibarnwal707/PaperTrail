@@ -34,6 +34,7 @@ class Bundle:
     profiles: dict
     categories: dict
     meta: dict
+    cases: dict = field(default_factory=dict)          # cached investigator summaries (data/demo/cached_cases.json), by account
     _boosters: list = field(default_factory=list, repr=False)
 
     @property
@@ -60,8 +61,9 @@ def load_bundle(root: Path | str) -> Bundle:
     root = Path(root)
     pq = {n: pl.read_parquet(root / f"{n}.parquet") for n in ("alerts", "edges", "history", "shap", "txns", "truth")}
     js = {n: json.loads((root / f"{n}.json").read_text()) for n in ("metrics", "profiles", "categories")}
+    cases = json.loads((root / "cached_cases.json").read_text()) if (root / "cached_cases.json").exists() else {}
     return Bundle(root=root, **pq, metrics=js["metrics"], labels=json.loads((root / "feature_labels.json").read_text()),
-                  profiles=js["profiles"], categories=js["categories"], meta=json.loads((root / "model" / "meta.json").read_text()))
+                  profiles=js["profiles"], categories=js["categories"], meta=json.loads((root / "model" / "meta.json").read_text()), cases=cases)
 
 
 # ---------------------------------------------------------------- plain-language formatting

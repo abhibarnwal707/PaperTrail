@@ -63,3 +63,43 @@ def test_what_if_responds_to_changed_inputs(run):
 def test_every_page_renders_in_the_light_theme(run, page):
     _ok(run(page=page, theme="light"))
     _ok(run(page=page, theme="no-such-theme"))
+
+
+def _bundle_with_case(tmp_path, account):
+    import shutil
+
+    root = tmp_path / "demo"
+    shutil.copytree(DEMO, root)
+    case = {"summary": {"account_id": account, "risk_score": 5.61, "suspected_typology": "FAN-IN", "recommended_action": "escalate_SAR",
+                        "narrative": "Many senders pay this account in a short time.",
+                        "evidence": [{"claim": "Ranked 1 of 200 by the blend model", "source_id": f"alert:{account}"},
+                                     {"claim": "5 distinct senders", "source_id": f"subgraph:{account}"}]},
+            "verified": True, "drafts": 1, "provider": "groq", "model": "llama-3.3-70b-versatile", "total_latency_s": 3.2, "generated_at": "2026-10-20 12:00 UTC"}
+    (root / "cached_cases.json").write_text(__import__("json").dumps({account: case}))
+    return root
+
+
+def test_account_page_shows_the_cached_case_summary(tmp_path, monkeypatch):
+    import polars as pl
+    from streamlit.testing.v1 import AppTest
+
+    account = pl.read_parquet(DEMO / "alerts.parquet").sort("blend_rank")["account"][0]
+    monkeypatch.setenv("PAPERTRAIL_DEMO_DIR", str(_bundle_with_case(tmp_path, account)))
+    for k in ("LLM_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY"):
+        monkeypatch.setenv(k, "")
+    at = AppTest.from_file(str(APP), default_timeout=120)
+    at.query_params["page"] = "account"
+    at.query_params["account"] = account
+    at.run()
+    _ok(at)
+    text = " ".join(m.value for m in at.markdown)
+    assert "AI case summary" in text and "Many senders pay this account" in text and "Escalate (SAR)" in text and "Verified against tool outputs" in text
+
+
+def test_account_without_a_cached_case_says_so(run):
+    import polars as pl
+
+    account = pl.read_parquet(DEMO / "alerts.parquet").sort("blend_rank")["account"][-1]
+    at = run(page="account", account=account)
+    _ok(at)
+    assert any("No summary is cached for this account" in m.value for m in at.markdown)
