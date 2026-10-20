@@ -1,8 +1,9 @@
 """PaperTrail scoring API.
 
 Self-contained on purpose (no `papertrail` import): it needs only fastapi, pydantic, numpy, polars and xgboost, which keeps the
-Docker image small. The model lives in `$PAPERTRAIL_MODEL_DIR` (default data/demo/model) as `xgb.json` plus `meta.json`:
-    {"feature_names": [...in training order...], "threshold": 0.93, "model": "xgb_v2_final"}
+Docker image small. The model lives in `$PAPERTRAIL_MODEL_DIR` (default data/demo/model) as one or more booster files plus `meta.json`:
+    {"feature_names": [...in training order...], "threshold": 0.93, "model": "xgb_v2_final", "files": ["xgb_seed0.json", ...]}
+`files` is optional (default ["xgb.json"]); with several files the probabilities are averaged, as in the evaluated 3-seed ensemble.
 Account-level SHAP evidence is read from `$PAPERTRAIL_DEMO_DIR/shap.parquet` (columns: account, feature, value, contribution).
 
 The API scores a transaction from FEATURES the caller supplies. History features (rolling counts, counterparty counts, ...) need an
@@ -25,25 +26,34 @@ log = logging.getLogger("papertrail.api")
 
 
 class Scorer:
-    """An XGBoost booster plus its feature order and alert threshold."""
+    """One or more XGBoost boosters (their probabilities are averaged), the feature order, and the alert threshold."""
 
-    def __init__(self, booster, feature_names: list[str], threshold: float, name: str = "xgb"):
-        self.booster, self.feature_names, self.threshold, self.name = booster, list(feature_names), float(threshold), name
+    def __init__(self, boosters, feature_names: list[str], threshold: float, name: str = "xgb"):
+        self.boosters = list(boosters) if isinstance(boosters, (list, tuple)) else [boosters]
+        self.feature_names, self.threshold, self.name = list(feature_names), float(threshold), name
+
+    @property
+    def booster(self):                            # first booster, for single-model callers and tests
+        return self.boosters[0]
 
     @classmethod
     def load(cls, model_dir: Path) -> Scorer:
         import xgboost as xgb  # imported lazily so the API module loads without a working xgboost
 
         meta = json.loads((model_dir / "meta.json").read_text())
-        booster = xgb.Booster()
-        booster.load_model(str(model_dir / "xgb.json"))
-        return cls(booster, meta["feature_names"], meta["threshold"], meta.get("model", "xgb"))
+        boosters = []
+        for fname in meta.get("files", ["xgb.json"]):
+            b = xgb.Booster()
+            b.load_model(str(model_dir / fname))
+            boosters.append(b)
+        return cls(boosters, meta["feature_names"], meta["threshold"], meta.get("model", "xgb"))
 
     def score(self, rows: list[dict]) -> np.ndarray:
         import xgboost as xgb
 
         x = np.array([[np.nan if r.get(f) is None else r[f] for f in self.feature_names] for r in rows], dtype=np.float32)
-        return self.booster.predict(xgb.DMatrix(x, feature_names=self.feature_names))
+        d = xgb.DMatrix(x, feature_names=self.feature_names)
+        return np.mean([b.predict(d) for b in self.boosters], axis=0)
 
 
 class ScoreRequest(BaseModel):

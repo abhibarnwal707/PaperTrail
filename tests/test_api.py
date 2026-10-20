@@ -116,3 +116,30 @@ def test_real_xgboost_model_roundtrip(tmp_path):
     expect = float(booster.predict(xgb.DMatrix(np.array([[2.0, 0.0, 0.0]], dtype=np.float32), feature_names=names))[0])
     assert got["score"] == pytest.approx(expect, abs=1e-6) and got["flagged"] is (expect >= 0.5)
     assert c.post("/score", json={"features": {"f_a": 2.0}}).status_code == 200      # missing -> NaN is fine for XGBoost
+
+
+def test_real_xgboost_ensemble_averages_probabilities(tmp_path):
+    try:
+        import xgboost as xgb
+    except Exception:                                       # noqa: BLE001
+        pytest.skip("xgboost is not usable here")
+    rng = np.random.default_rng(1)
+    X = rng.normal(size=(400, 2)).astype(np.float32)
+    y = (X[:, 0] > 0).astype(int)
+    names = ["a", "b"]
+    model_dir = tmp_path / "model"
+    model_dir.mkdir()
+    boosters = []
+    for i in range(2):
+        b = xgb.train({"objective": "binary:logistic", "max_depth": 2, "seed": i, "subsample": 0.7},
+                      xgb.DMatrix(X, label=y, feature_names=names), 10)
+        b.save_model(str(model_dir / f"m{i}.json"))
+        boosters.append(b)
+    (model_dir / "meta.json").write_text(json.dumps(
+        {"feature_names": names, "threshold": 0.5, "model": "ens", "files": ["m0.json", "m1.json"]}))
+    scorer = Scorer.load(model_dir)
+    assert len(scorer.boosters) == 2
+    d = xgb.DMatrix(np.array([[1.5, 0.0]], dtype=np.float32), feature_names=names)
+    expect = float(np.mean([b.predict(d)[0] for b in boosters]))
+    got = TestClient(create_app(scorer=scorer, demo_dir=tmp_path)).post("/score", json={"features": {"a": 1.5, "b": 0.0}}).json()
+    assert got["score"] == pytest.approx(expect, abs=1e-6)

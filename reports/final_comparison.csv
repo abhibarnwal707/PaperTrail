@@ -1,0 +1,7 @@
+model,test_pr_auc,test_pr_auc_std,test_f1,test_recall_at_1pct_fpr,test_precision_at_1000
+Rules (v1),0.008,,0.03,0.012,0.0
+Rules v2,0.007,,0.025,0.014,0.0
+XGBoost tabular (stable settings),0.065,0.003,0.148,0.454,0.145
+"XGBoost history features (final, 3 seeds)",0.436,0.004,0.506,0.659,0.443
+GNN (3 seeds),0.255,0.025,0.297,0.675,0.29
+Blend GNN + XGBoost (3 seed pairs),0.497,0.016,0.542,0.724,0.475

@@ -297,6 +297,39 @@ Notebooks `04b-xgboost-final.ipynb` (XGBoost, 16 tabular + 33 history features =
 - **The GNN is noisier across seeds** (std 0.025 vs 0.004). Seed 2 stopped after 9 epochs with validation PR-AUC 0.288, against 0.350 and 0.360 for the other seeds; validation PR-AUC fluctuates between epochs, and picking the best epoch from a noisy series flatters validation (validation 0.333 vs test 0.255 on average). Report the 3-seed mean or ensemble, not one seed.
 - **Dropping `age_s` cost about 0.006** (0.436 here vs 0.442 in 03d with age), roughly 1.5 seed standard deviations: borderline, not clearly zero. The age-free set is kept because age is a calendar artefact (section 5d).
 
+## 5f. The blend, and what it says about the GNN (Phase 5.4, `notebooks/05-blend.ipynb`)
+
+Score-level blend, no retraining. Each model's probability is turned into a logit and standardised with that model's validation mean and standard deviation; blend = w * GNN + (1 - w) * XGBoost with w picked on validation PR-AUC; threshold = validation F1-optimal; test scored once. Raw numbers: `reports/blend_summary.json`, `reports/typology_recall_models.csv`, final table `reports/final_comparison.csv`. Run logged to DagsHub as `blend`.
+
+| Model (test) | PR-AUC | F1 | Recall@1%FPR | Precision@1000 |
+|---|---|---|---|---|
+| Rules v1 | 0.008 | 0.030 | 0.012 | 0.000 |
+| XGBoost tabular | 0.065 +- 0.003 | 0.148 | 0.454 | 0.145 |
+| XGBoost history features | 0.436 +- 0.004 | 0.506 | 0.659 | 0.443 |
+| GNN | 0.255 +- 0.025 | 0.297 | 0.675 | 0.290 |
+| **Blend** (3 seed pairs) | **0.497 +- 0.016** | **0.542** | **0.724** | **0.475** |
+| Blend of the two 3-seed ensembles | 0.505 | 0.550 | 0.729 | 0.483 |
+
+- **The blend beats both models on all four measures.** Over XGBoost alone: +0.061 PR-AUC, +0.036 F1, +0.065 recall at 1% false alarms, +0.032 precision@1000 (the seed spread is 0.004 to 0.016). The validation-chosen GNN weight is stable at 0.3 to 0.4 (0.4 for the ensemble recipe), so the gain does not hinge on one lucky weight.
+- **The models catch different transactions.** At a 1% false-alarm budget on test (956 laundering transactions): 550 caught by both, 127 by the GNN only, 78 by XGBoost only, 201 by neither. The GNN alone finds 13% of all positives that XGBoost misses.
+- **Two earlier expectations were wrong.** (1) I expected the GNN to be especially good at CYCLE. It is not: at each model's validation threshold CYCLE recall is XGBoost 0.53, GNN 0.33, blend 0.58. XGBoost with history features is at least as good on nearly every typology; the GNN's only tie is FAN-OUT (0.60 vs 0.60). The GNN helps through complementarity, not by being better at cycles. (2) The 39% of positives with no typology (371 test positives) are NOT blind spots in general: at the F1-optimal threshold (a high-precision operating point) all models recall almost none of them (XGBoost 0.00, GNN 0.04, blend 0.00), but at a 1% false-alarm budget the blend catches 72.9% of all positives, which is more than the 61% that have a typology, so at least about 110 of the 371 unmapped positives are caught at that looser cut. Earlier statements that unmapped positives are "essentially never recalled" apply only to the F1-optimal threshold.
+- **Recall by typology at the validation thresholds (test):**
+
+| Typology | n | XGBoost | GNN | Blend |
+|---|---|---|---|---|
+| GATHER-SCATTER | 127 | 0.74 | 0.54 | 0.78 |
+| SCATTER-GATHER | 110 | 0.62 | 0.53 | 0.72 |
+| STACK | 84 | 0.51 | 0.31 | 0.52 |
+| FAN-OUT | 65 | 0.60 | 0.60 | 0.71 |
+| FAN-IN | 57 | 0.70 | 0.54 | 0.77 |
+| CYCLE | 55 | 0.53 | 0.33 | 0.58 |
+| BIPARTITE | 44 | 0.64 | 0.34 | 0.61 |
+| RANDOM | 43 | 0.56 | 0.21 | 0.56 |
+| UNMAPPED | 371 | 0.00 | 0.04 | 0.00 |
+
+  Per-typology counts are small (43 to 127), so differences under about 0.10 are noise-level.
+- **Caveats for the README:** synthetic data; one 10-day window; the blend weight and thresholds are chosen on a validation window that is also small; the "XGBoost" and "GNN" in the table are 3-seed means (not a single lucky run).
+
 ## 6. Open items
 
 - [x] Save the full daily table (`reports/daily.csv`).
@@ -313,4 +346,4 @@ Notebooks `04b-xgboost-final.ipynb` (XGBoost, 16 tabular + 33 history features =
 - [x] Stabilise XGBoost training (section 5d). Multi-seed means are now the reporting convention.
 - [x] 03d `recent` arms: calendar-stable features are worse than v2 history (section 5d).
 - [x] Phase 5: GNN and final XGBoost trained on Kaggle (section 5e).
-- [ ] Blend notebook (`05-blend.ipynb`): GNN + XGBoost score blend, recall per typology, complementarity.
+- [x] Blend notebook (`05-blend.ipynb`): section 5f. Best system: blend, test PR-AUC 0.497.
