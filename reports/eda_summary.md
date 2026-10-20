@@ -237,7 +237,7 @@ The earlier 0.351 is the best of the three. The honest figure is about **0.31, s
 
 ## 5d. Account age, training settings and day 1 (Phase 4c, `notebooks/03c_stability.py`, `03d_stationary.py`)
 
-Run locally on the Mac (03c, partly) and on Kaggle (03d). Raw numbers: `reports/age_distribution.csv`; 03d outputs `stationary_table.csv`, `stationary_metrics.json` once downloaded.
+Account-age diagnostic and stable-settings comparison (03c) were first run on a laptop, so the local run's raw output is deleted; the notebook `04b-xgboost-final.ipynb` on Kaggle regenerates `age_distribution.csv` and re-runs the stable settings with logging to DagsHub. 03d (Kaggle) outputs: `stationary_table.csv`, `stationary_metrics.json`. Numbers in this section marked "03c" are from the laptop run and should be replaced by the Kaggle re-run.
 
 ### Account age is a calendar artefact with no signal in val/test
 `age_s` is "time since the account's first transaction in this 18-day window", not a real account age (the data has no opening dates). It therefore grows with the calendar.
@@ -259,19 +259,22 @@ Run locally on the Mac (03c, partly) and on Kaggle (03d). Raw numbers: `reports/
 | original (depth 6, full class weight, 50 early stopping) | 0.318 +- 0.015 | 0.301 +- 0.014 |
 | stable (depth 4, min_child_weight 10, lambda 10, subsample/colsample 0.7, sqrt class weight) | 0.498 +- 0.001 | 0.434 +- 0.008 |
 
-The original settings stopped after about 30 trees (overfit to the train period at once); the stable settings use about 600 and have a seed spread 2-10x smaller. Even the tabular-only model rises from 0.046 to 0.065. The 0.312 from 5c was therefore partly a training-settings problem. The local Mac run reproduced the Kaggle number for the original settings (0.301 vs 0.312), so local and Kaggle runs are comparable.
+The original settings stopped after about 30 trees (overfit to the train period at once); the stable settings use about 600 and have a seed spread 2-10x smaller. Even the tabular-only model rises from 0.046 to 0.065. The 0.312 from 5c was therefore partly a training-settings problem.312), so local and Kaggle runs are comparable.
 
-### 03d (Kaggle), arms finished so far (stable settings, 3 seeds; threshold on validation)
-| Arm | Train rows | Test PR-AUC | Test F1 | Recall@1%FPR | Precision@1000 |
-|---|---|---|---|---|---|
-| tabular | 3,248,921 | 0.065 +- 0.003 | 0.148 | 0.454 | 0.145 |
-| tabular + burn-in | 2,134,000 | 0.063 +- 0.001 | 0.145 | 0.452 | 0.140 |
-| v2 history (51 features) | 3,248,921 | **0.442 +- 0.004** | 0.499 | 0.675 | 0.461 |
-| v2 history + burn-in | 2,134,000 | 0.435 +- 0.011 | 0.491 | 0.685 | 0.444 |
+### 03d (Kaggle): calendar-stable features and day-1 burn-in (stable settings, 3 seeds, threshold on validation)
+| Arm | Features | Train rows | Val PR-AUC | Test PR-AUC | Test F1 | Recall@1%FPR | Precision@1000 |
+|---|---|---|---|---|---|---|---|
+| tabular | 16 | 3,248,921 | 0.064 | 0.065 +- 0.003 | 0.148 | 0.454 | 0.145 |
+| tabular + burn-in | 16 | 2,134,000 | 0.067 | 0.063 +- 0.001 | 0.145 | 0.452 | 0.140 |
+| **v2 history** | 51 | 3,248,921 | 0.500 | **0.442 +- 0.004** | 0.499 | 0.675 | 0.461 |
+| v2 history + burn-in | 51 | 2,134,000 | 0.497 | 0.435 +- 0.011 | 0.491 | 0.685 | 0.444 |
+| recent (calendar-stable) | 46 | 3,248,921 | 0.430 | 0.370 +- 0.004 | 0.431 | 0.615 | 0.399 |
+| recent + burn-in | 46 | 2,134,000 | 0.446 | 0.391 +- 0.002 | 0.455 | 0.631 | 0.418 |
 
-- **Burn-in (dropping day-1 rows from training) does not help**: no change for the tabular model, slightly worse (within noise) for v2 history. The hypothesis that the day-1 rows teach a harmful lesson is not supported; dropping them only loses data. Keep day 1 in training.
-- Best iterations are 573-634 of 1,000 allowed, so early stopping now triggers on its own.
-- The `recent` arms (stable feature set, with and without burn-in) were still running when this was written. **Pending:** whether the calendar-stable set matches or beats v2 history. If it is clearly lower, the cumulative features carry real signal that needs separate explanation.
+- **The calendar-stable set is worse, not better.** 0.37 to 0.39 against 0.442 for v2 history, a gap of 0.05 to 0.07 when the seed spread is 0.002 to 0.004. So the hypothesis "the long-window and cumulative features only help through a calendar artefact" is not supported as a whole: age is worthless (section above), but the 7-day windows, all-time totals, distinct counterparties and graph flags carry signal beyond the 24-hour windows. Whether that signal is behaviour ("accounts with a long record look different") or partly an artefact of how long we have observed each account cannot be separated with 10 days of data. State this as a caveat in the README.
+- **Burn-in is not a general fix.** It helps the stable-window set (+0.021, beyond noise), plausibly because the first 24 hours have incomplete windows, and slightly hurts v2 history (-0.007, about 1 std of that arm). It does nothing for the tabular model. Day 1 stays in training for the final XGBoost.
+- Top v2 history features by gain: the two ACH columns (about 0.60 combined), then `s_uniq_out` 0.043, `s_gap_s` 0.035, `in_amount_band` 0.033. Top recent features: the ACH columns (0.60), `in_amount_band`, `s_gap_s`, 1h and 6h send counts.
+- **Decision:** the final XGBoost feature set is v2 history. Dropping `age_s` costs nothing (0.429 vs 0.434, section above), so the cleaner final set is v2 history without `age_s`; re-check when the final model is retrained.
 
 ### Current best XGBoost result to beat with the GNN
 Test PR-AUC **0.442 +- 0.004** (3 seeds), F1 0.499, recall@1%FPR 0.675, precision@1000 0.461.
@@ -290,5 +293,5 @@ Test PR-AUC **0.442 +- 0.004** (3 seeds), F1 0.499, recall@1%FPR 0.675, precisio
 - [x] Distribution check of `age_s` and test of removing it (section 5d). Per-feature ablation of the other timing features not done.
 - [ ] Characterise the 371 unmapped test positives (the model recalls about none).
 - [x] Stabilise XGBoost training (section 5d). Multi-seed means are now the reporting convention.
-- [ ] 03d `recent` arms: calendar-stable features vs v2 history.
+- [x] 03d `recent` arms: calendar-stable features are worse than v2 history (section 5d).
 - [ ] Phase 5: GNN (`notebooks/04_gnn.py` / `04-gnn.ipynb`), debug run then full GPU run.
