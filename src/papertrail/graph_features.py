@@ -30,6 +30,18 @@ HISTORY_FEATURES = (
 )
 
 
+# "Stationary" set: windows of at most 24 h plus the gap since the last event. Windows longer than the history we
+# have (7 d, all-time totals, account age, distinct counterparties so far, PageRank) change meaning as the calendar
+# moves: on day 3 a "7-day" window covers 2 days, on day 9 it covers 7. These short windows mean the same thing on
+# every day from day 2 on, so train, validation and test see the same feature distribution.
+RECENT_WINDOWS = ("1h", "6h", "24h")
+RECENT_ACCOUNT_FEATURES = (
+    [f"{k}_{w}" for w in RECENT_WINDOWS for k in ("out_cnt", "in_cnt", "out_sum", "in_sum")]
+    + ["out_mean_24h", "in_mean_24h", "gap_s"]
+)
+RECENT_FEATURES = [f"s_{c}" for c in RECENT_ACCOUNT_FEATURES] + [f"d_{c}" for c in RECENT_ACCOUNT_FEATURES]
+
+
 def _check_sorted(df: pl.DataFrame, ts_col: str = "ts") -> None:
     if not df[ts_col].is_sorted():
         raise ValueError(f"df must be sorted by {ts_col}")
@@ -94,6 +106,52 @@ def account_features(df: pl.DataFrame) -> pl.DataFrame:
     return (df.select("txn_id")
               .join(side(0, "s_"), on="txn_id", how="left")
               .join(side(1, "d_"), on="txn_id", how="left"))
+
+
+def recent_features(df: pl.DataFrame) -> pl.DataFrame:
+    """Calendar-stable sender (`s_*`) and receiver (`d_*`) features, keyed by `txn_id`.
+
+    Counts and sums of the account's earlier outgoing / incoming events in [t - w, t) for w in 1h, 6h, 24h, the 24h
+    mean amounts, and `gap_s` (seconds since the account's previous event, null if it has none). Nothing here
+    depends on how long the dataset has been running, apart from the first 24 h where windows are not yet full.
+    """
+    _check_sorted(df)
+    ev = _event_table(df)
+    is_out = pl.col("dir") == 0
+    ev = ev.with_columns(
+        is_out.cast(pl.UInt32).alias("c_out"),
+        (~is_out).cast(pl.UInt32).alias("c_in"),
+        pl.when(is_out).then(pl.col("amt")).otherwise(0.0).alias("a_out"),
+        pl.when(~is_out).then(pl.col("amt")).otherwise(0.0).alias("a_in"),
+    )
+    ev = ev.with_columns(
+        *[pl.col(col).rolling_sum_by("ts", w, closed="left").over("acct").fill_null(0).alias(f"{name}_{w}")
+          for w in RECENT_WINDOWS
+          for col, name in (("c_out", "out_cnt"), ("c_in", "in_cnt"), ("a_out", "out_sum"), ("a_in", "in_sum"))],
+        (pl.col("ts") - pl.col("ts").shift(1).over("acct")).dt.total_seconds().alias("gap_s"),
+    ).with_columns(
+        pl.when(pl.col("out_cnt_24h") > 0).then(pl.col("out_sum_24h") / pl.col("out_cnt_24h")).alias("out_mean_24h"),
+        pl.when(pl.col("in_cnt_24h") > 0).then(pl.col("in_sum_24h") / pl.col("in_cnt_24h")).alias("in_mean_24h"),
+    )
+
+    def side(direction: int, prefix: str) -> pl.DataFrame:
+        return ev.filter(pl.col("dir") == direction).select(
+            "txn_id", *[pl.col(c).alias(prefix + c) for c in RECENT_ACCOUNT_FEATURES]
+        )
+
+    return (df.select("txn_id")
+              .join(side(0, "s_"), on="txn_id", how="left")
+              .join(side(1, "d_"), on="txn_id", how="left"))
+
+
+def add_recent_features(df: pl.DataFrame) -> pl.DataFrame:
+    """`df` with all RECENT_FEATURES present (same rows, same order). `df` must be sorted by ts.
+
+    Some recent features (the 24 h counts/sums and `gap_s`) have the same definition as columns of
+    `add_history_features`; those are not added a second time.
+    """
+    feats = recent_features(df)
+    return df.join(feats.select("txn_id", *[c for c in RECENT_FEATURES if c not in df.columns]), on="txn_id", how="left")
 
 
 def reciprocal_flag(df: pl.DataFrame) -> pl.DataFrame:

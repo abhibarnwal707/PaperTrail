@@ -7,10 +7,13 @@ from polars.testing import assert_frame_equal
 
 from papertrail.graph_features import (
     HISTORY_FEATURES,
+    RECENT_FEATURES,
     account_features,
     add_history_features,
+    add_recent_features,
     daily_pagerank,
     pagerank,
+    recent_features,
     reciprocal_flag,
 )
 
@@ -129,3 +132,59 @@ def test_add_history_features_keeps_rows_and_adds_all_columns():
     assert out["txn_id"].to_list() == df["txn_id"].to_list()
     assert all(c in out.columns for c in HISTORY_FEATURES)
     assert len(HISTORY_FEATURES) == len(set(HISTORY_FEATURES)) == 35
+
+
+def test_recent_features_hand_computed():
+    f = recent_features(_frame(TOY))
+    # txn 2 (2h), sender a: paid 100 at 0h (2h ago), received 50 at 1h (exactly 1h ago, inside [t-1h, t))
+    r = _row(f, 2)
+    assert (r["s_out_cnt_1h"], r["s_in_cnt_1h"], r["s_in_sum_1h"]) == (0, 1, 50.0)
+    assert (r["s_out_cnt_6h"], r["s_out_sum_6h"], r["s_in_cnt_6h"]) == (1, 100.0, 1)
+    assert (r["s_out_mean_24h"], r["s_in_mean_24h"], r["s_gap_s"]) == (100.0, 50.0, 3600)
+    # txn 3 (30h): everything a did is 28h or more ago, so all windows are empty and the gap is 28h
+    r = _row(f, 3)
+    assert (r["s_out_cnt_24h"], r["s_in_cnt_24h"], r["s_out_mean_24h"], r["s_gap_s"]) == (0, 0, None, 28 * 3600)
+    # txn 4 (31h): sender c last acted 29h ago; receiver a paid 20 an hour ago
+    r = _row(f, 4)
+    assert (r["s_out_cnt_24h"], r["s_in_cnt_24h"]) == (0, 0)
+    assert (r["d_out_cnt_1h"], r["d_out_sum_1h"], r["d_out_cnt_24h"], r["d_out_mean_24h"], r["d_gap_s"]) == (1, 20.0, 1, 20.0, 3600)
+    # first event of an account: nothing before it
+    r = _row(f, 0)
+    assert r["s_gap_s"] is None and r["s_out_cnt_24h"] == 0
+
+
+def test_recent_features_do_not_use_the_future():
+    base = _frame(TOY)
+    later = _frame([(300 + i, "a", "b", 7.0) for i in range(5)] + [(400, "c", "a", 3.0)], first_id=100)
+    assert_frame_equal(recent_features(base), recent_features(pl.concat([base, later])).head(base.height))
+
+
+def test_recent_features_are_calendar_stable():
+    # The same burst of activity a week later gives identical features: nothing counts "time since the data began".
+    burst = [(0, "a", "b", 10.0), (1, "a", "c", 20.0), (2, "a", "d", 30.0)]
+    early = recent_features(_frame(burst))
+    late = recent_features(_frame([(h + 7 * 24, s, d, a) for h, s, d, a in burst]))
+    assert_frame_equal(early, late)
+
+
+def test_recent_features_require_sorted_input_and_add_all_columns():
+    with pytest.raises(ValueError):
+        recent_features(_frame(TOY).reverse())
+    out = add_recent_features(_frame(TOY))
+    assert out.height == len(TOY) and all(c in out.columns for c in RECENT_FEATURES)
+    assert len(RECENT_FEATURES) == len(set(RECENT_FEATURES)) == 30
+
+
+def test_recent_features_match_history_features_where_they_overlap():
+    df = _frame(TOY)
+    overlap = [c for c in RECENT_FEATURES if c in HISTORY_FEATURES]
+    assert len(overlap) == 10          # 24 h counts and sums (4) plus gap_s, on both sides
+    both = account_features(df).join(recent_features(df), on="txn_id", suffix="_recent")
+    for c in overlap:
+        assert both[c].to_list() == both[c + "_recent"].to_list(), c
+
+
+def test_add_recent_features_does_not_duplicate_columns():
+    out = add_recent_features(add_history_features(_frame(TOY).with_columns(label=pl.lit(0))))
+    assert len(out.columns) == len(set(out.columns))
+    assert all(c in out.columns for c in RECENT_FEATURES + HISTORY_FEATURES)

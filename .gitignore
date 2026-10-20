@@ -5,3 +5,7 @@ __pycache__/
 .DS_Store
 .ipynb_checkpoints/
 CLAUDE.md
+
+# local data, logs (large or machine-specific)
+data/local/
+logs/
