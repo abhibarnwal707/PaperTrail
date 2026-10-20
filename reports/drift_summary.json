@@ -1,35 +1,27 @@
 {
  "generated": "2026-10-20",
- "reference": "train window Sep 1-6 (200,000-row sample; validation Sep 7-8 for the scores)",
+ "reference": "train window Sep 2-6 (200,000-row sample; Sep 1's midnight burst of Reinvestment self-transfers is excluded and shown in the day-by-day table; validation Sep 7-8 for the scores)",
  "current": "test window Sep 9-10 (200,000-row sample)",
  "decision": {
-  "retrain": true,
-  "drifted": [
-   "fmt_Reinvestment",
-   "s_gap_s",
-   "is_self_transfer",
-   "d_gap_s",
-   "is_same_bank"
-  ],
+  "retrain": false,
+  "drifted": [],
   "expected_calendar_drift": [
    "s_pagerank",
-   "d_pagerank",
-   "d_tot_in",
-   "s_tot_out",
-   "d_in_cnt_7d",
-   "s_tot_in",
-   "d_uniq_in",
-   "d_out_cnt_7d",
-   "s_in_cnt_7d",
-   "s_uniq_out",
+   "s_out_mean_7d",
+   "d_in_mean_7d",
    "s_out_cnt_7d",
    "d_out_mean_7d",
-   "d_tot_out",
-   "d_in_mean_7d",
    "s_in_mean_7d",
-   "s_out_mean_7d",
    "d_in_sum_7d",
-   "d_out_sum_7d"
+   "s_in_sum_7d",
+   "s_tot_out",
+   "d_out_sum_7d",
+   "d_tot_in",
+   "d_in_cnt_7d",
+   "d_out_cnt_7d",
+   "s_in_cnt_7d",
+   "s_tot_in",
+   "d_tot_out"
   ],
   "rule": "retrain if PSI > 0.2 on 3+ of the top 15 calendar-stable features"
  },
@@ -107,34 +99,29 @@
  "n_features": 49,
  "bands": [
   {
-   "band": "major",
-   "calendar_dependent": false,
-   "len": 5
-  },
-  {
-   "band": "moderate",
-   "calendar_dependent": true,
-   "len": 5
-  },
-  {
-   "band": "major",
-   "calendar_dependent": true,
-   "len": 16
-  },
-  {
-   "band": "stable",
-   "calendar_dependent": true,
-   "len": 2
-  },
-  {
-   "band": "stable",
-   "calendar_dependent": false,
-   "len": 20
-  },
-  {
    "band": "moderate",
    "calendar_dependent": false,
    "len": 1
+  },
+  {
+   "band": "stable",
+   "calendar_dependent": false,
+   "len": 25
+  },
+  {
+   "band": "major",
+   "calendar_dependent": true,
+   "len": 13
+  },
+  {
+   "band": "moderate",
+   "calendar_dependent": true,
+   "len": 4
+  },
+  {
+   "band": "stable",
+   "calendar_dependent": true,
+   "len": 6
   }
  ]
 }

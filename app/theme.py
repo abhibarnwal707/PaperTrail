@@ -325,7 +325,9 @@ def header(title: str, sub: str = "", right: str = "", crumb: str = "", mono: bo
             f'{f"<div class=sub>{sub}</div>" if sub else ""}</div><div class="right">{right}</div></div>')
 
 
-def button(text: str, url: str, kind: str = "primary", ic: str = "") -> str:
+def button(text: str, url: str, kind: str = "primary", ic: str = "", external: bool = False) -> str:
+    if external:                                   # another site: open in a new tab, keep the console where it is
+        return f'<a class="btn {kind}" target="_blank" rel="noopener noreferrer" href="{esc(url)}">{icon(ic) if ic else ""}{esc(text)}</a>'
     return link(url, (icon(ic) if ic else "") + esc(text), f"btn {kind}")
 
 

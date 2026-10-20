@@ -22,6 +22,7 @@ PAGES = {"queue": "Alerts", "account": "Investigate", "try": "Simulator", "model
 SEG = {"blend": "Blend", "xgb": "XGBoost", "gnn": "GNN"}
 PLOT = {"displayModeBar": False}
 PER_PAGE = 25
+DRIFT_URL = "https://abhibarnwal707.github.io/PaperTrail/"       # GitHub Pages, built from docs/ (Phase 8)
 PROFILE_NAMES = {"new_account": "New account", "typical_customer": "Typical customer", "busy_business": "Busy business", "rapid_sender": "Rapid sender", "dormant_returning": "Dormant, returning"}
 
 
@@ -217,7 +218,7 @@ def page_try(b: logic.Bundle, S: dict) -> None:
 def page_models(b: logic.Bundle, S: dict) -> None:
     m = b.metrics
     bl = m["models"]["blend"]
-    html(theme.header("Model performance", f"{m['n_test_transactions']:,} unseen payments · {m['n_test_positives']:,} laundering · 3-seed means", tools(S)))
+    html(theme.header("Model performance", f"{m['n_test_transactions']:,} unseen payments · {m['n_test_positives']:,} laundering · 3-seed means", tools(S, theme.button("Drift report", DRIFT_URL, "ghost", ic="trail", external=True))))
 
     def delta(k: str, pct: bool = False) -> str:
         d = bl[k] - max(m["models"]["xgb"][k], m["models"]["gnn"][k])
