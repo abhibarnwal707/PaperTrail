@@ -16,3 +16,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 extend-exclude = ["notebooks"]   # Kaggle notebook cells are not linted
+
+[tool.pytest.ini_options]
+pythonpath = ["."]   # lets tests import the top-level `api` package when run as plain `pytest` (as CI does)
+testpaths = ["tests"]
