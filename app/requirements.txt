@@ -1,5 +1,8 @@
-streamlit>=1.46
-polars>=1.0
-plotly>=5.20
-numpy
-xgboost>=2.0
+# Streamlit Community Cloud installs this file (it sits next to the entrypoint, app/streamlit_app.py).
+# streamlit is pinned: app/theme.py styles Streamlit 1.66's DOM (data-testids, widget structure).
+# xgboost-cpu: the same library without the ~200 MB CUDA/NCCL wheel; 3.4.1 is the version that saved data/demo/model/.
+streamlit==1.66.0
+polars>=2.0,<3
+plotly>=7.1,<8
+numpy>=2.0
+xgboost-cpu==3.4.1
