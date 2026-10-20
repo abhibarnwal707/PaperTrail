@@ -1,0 +1,13 @@
+.git
+.venv
+.github
+notebooks
+reports
+docs
+tests
+scripts
+src
+data/local
+logs
+**/__pycache__
+*.egg-info

@@ -279,6 +279,24 @@ The original settings stopped after about 30 trees (overfit to the train period 
 ### Current best XGBoost result to beat with the GNN
 Test PR-AUC **0.442 +- 0.004** (3 seeds), F1 0.499, recall@1%FPR 0.675, precision@1000 0.461.
 
+## 5e. Phase 5 results: final XGBoost and the GNN (Kaggle, logged to DagsHub)
+
+Notebooks `04b-xgboost-final.ipynb` (XGBoost, 16 tabular + 33 history features = v2 history without `age_s`, stable settings) and `04-gnn.ipynb` (GINE on daily graph snapshots, edge features only, no history features). 3 seeds each; threshold on validation; test scored once. Raw numbers: `reports/xgb_summary.json`, `reports/gnn_summary.json`; models and score files are on DagsHub (and `reports/*_scores.parquet`, git-ignored).
+
+| Model | Test PR-AUC | F1 (minority) | Recall@1%FPR | Precision@1000 |
+|---|---|---|---|---|
+| XGBoost tabular (03d) | 0.065 +- 0.003 | 0.148 | 0.454 | 0.145 |
+| **XGBoost final (3 seeds)** | **0.436 +- 0.004** | **0.506 +- 0.007** | 0.659 +- 0.007 | **0.443 +- 0.007** |
+| GNN (3 seeds) | 0.255 +- 0.025 | 0.297 +- 0.023 | **0.675 +- 0.034** | 0.290 +- 0.020 |
+| XGBoost, 3-seed average-probability ensemble | 0.442 | 0.512 | 0.657 | 0.446 |
+| GNN, 3-seed ensemble | 0.281 | 0.315 | **0.708** | 0.305 |
+
+- **The GNN, with no account-history features, is about 4x the tabular model** in PR-AUC (0.255 vs 0.065): the graph structure alone carries a lot of signal.
+- **XGBoost with history features is still ahead on precision-oriented measures** (PR-AUC, F1, precision@1000), by a wide margin.
+- **The GNN is ahead on recall at a fixed 1% false-alarm budget** (0.675 vs 0.659 for single seeds; 0.708 vs 0.657 for ensembles), within seed noise for single seeds but clearer for ensembles. The two models therefore seem to rank different transactions highly, which is the case for a blend (pending, notebook `05-blend`).
+- **The GNN is noisier across seeds** (std 0.025 vs 0.004). Seed 2 stopped after 9 epochs with validation PR-AUC 0.288, against 0.350 and 0.360 for the other seeds; validation PR-AUC fluctuates between epochs, and picking the best epoch from a noisy series flatters validation (validation 0.333 vs test 0.255 on average). Report the 3-seed mean or ensemble, not one seed.
+- **Dropping `age_s` cost about 0.006** (0.436 here vs 0.442 in 03d with age), roughly 1.5 seed standard deviations: borderline, not clearly zero. The age-free set is kept because age is a calendar artefact (section 5d).
+
 ## 6. Open items
 
 - [x] Save the full daily table (`reports/daily.csv`).
@@ -294,4 +312,5 @@ Test PR-AUC **0.442 +- 0.004** (3 seeds), F1 0.499, recall@1%FPR 0.675, precisio
 - [ ] Characterise the 371 unmapped test positives (the model recalls about none).
 - [x] Stabilise XGBoost training (section 5d). Multi-seed means are now the reporting convention.
 - [x] 03d `recent` arms: calendar-stable features are worse than v2 history (section 5d).
-- [ ] Phase 5: GNN (`notebooks/04_gnn.py` / `04-gnn.ipynb`), debug run then full GPU run.
+- [x] Phase 5: GNN and final XGBoost trained on Kaggle (section 5e).
+- [ ] Blend notebook (`05-blend.ipynb`): GNN + XGBoost score blend, recall per typology, complementarity.

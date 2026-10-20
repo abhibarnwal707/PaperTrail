@@ -10,11 +10,11 @@ from pathlib import Path
 
 
 def convert(src: str) -> dict:
-    head, *chunks = re.split(r"^# %%[^\n]*\n", src, flags=re.M)
+    head, *chunks = re.split(r"^# %%[^\n]*\n", src, flags=re.MULTILINE)
     intro = "".join(line[2:] if line.startswith("# ") else line.lstrip("#") for line in head.splitlines(keepends=True))
     cells = [{"cell_type": "markdown", "metadata": {}, "source": intro.splitlines(keepends=True)}] if intro.strip() else []
     for chunk in chunks:
-        code = re.sub(r"^# !", "!", chunk.strip("\n"), flags=re.M) + "\n"
+        code = re.sub(r"^# !", "!", chunk.strip("\n"), flags=re.MULTILINE) + "\n"
         cells.append({"cell_type": "code", "metadata": {"trusted": True}, "source": code.splitlines(keepends=True),
                       "outputs": [], "execution_count": None})
     return {"cells": cells, "nbformat": 4, "nbformat_minor": 4,

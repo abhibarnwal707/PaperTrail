@@ -9,3 +9,8 @@ CLAUDE.md
 # local data, logs (large or machine-specific)
 data/local/
 logs/
+
+# large run outputs live on DagsHub / Kaggle, not in git (the demo model is copied to data/demo/model)
+reports/*_scores.parquet
+reports/*.pt
+reports/xgb_v2_final_seed*.json

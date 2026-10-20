@@ -1,0 +1,151 @@
+{
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "per_seed": {
+    "0": {
+      "threshold": 0.8655241131782532,
+      "val_pr_auc": 0.5032186667342383,
+      "val_f1": 0.5257861635220126,
+      "val_recall_at_1pct_fpr": 0.8011583011583011,
+      "val_precision_at_1000": 0.503,
+      "test_pr_auc": 0.4350771718615477,
+      "test_f1": 0.514745308310992,
+      "test_recall_at_1pct_fpr": 0.6537656903765691,
+      "test_precision_at_1000": 0.437,
+      "test_ach_pr_auc": 0.49863180548650965,
+      "test_ach_f1": 0.5605839416058395,
+      "test_ach_recall_at_1pct_fpr": 0.5719424460431655,
+      "test_ach_precision_at_1000": 0.437
+    },
+    "1": {
+      "threshold": 0.8786365985870361,
+      "val_pr_auc": 0.48497341984010667,
+      "val_f1": 0.5095962938451357,
+      "val_recall_at_1pct_fpr": 0.7915057915057915,
+      "val_precision_at_1000": 0.485,
+      "test_pr_auc": 0.4409639097157187,
+      "test_f1": 0.5060412224591329,
+      "test_recall_at_1pct_fpr": 0.6684100418410042,
+      "test_precision_at_1000": 0.452,
+      "test_ach_pr_auc": 0.5046354285317733,
+      "test_ach_f1": 0.5540856031128405,
+      "test_ach_recall_at_1pct_fpr": 0.5779376498800959,
+      "test_ach_precision_at_1000": 0.452
+    },
+    "2": {
+      "threshold": 0.8783549070358276,
+      "val_pr_auc": 0.5027455028910797,
+      "val_f1": 0.5274725274725275,
+      "val_recall_at_1pct_fpr": 0.8001930501930502,
+      "val_precision_at_1000": 0.503,
+      "test_pr_auc": 0.43124986984592767,
+      "test_f1": 0.49793672627235214,
+      "test_recall_at_1pct_fpr": 0.6548117154811716,
+      "test_precision_at_1000": 0.439,
+      "test_ach_pr_auc": 0.4946799811015563,
+      "test_ach_f1": 0.5435435435435435,
+      "test_ach_recall_at_1pct_fpr": 0.5635491606714629,
+      "test_ach_precision_at_1000": 0.439
+    }
+  },
+  "mean_std": {
+    "val_pr_auc": [
+      0.4969791964884749,
+      0.008491563487897693
+    ],
+    "test_pr_auc": [
+      0.435763650474398,
+      0.0039953374753077765
+    ],
+    "test_f1": [
+      0.5062410856808257,
+      0.006863530020718709
+    ],
+    "test_recall_at_1pct_fpr": [
+      0.6589958158995817,
+      0.006670546188880383
+    ],
+    "test_precision_at_1000": [
+      0.4426666666666667,
+      0.006649979114420008
+    ],
+    "test_ach_pr_auc": [
+      0.4993157383732798,
+      0.004092966041813526
+    ],
+    "test_ach_f1": [
+      0.5527376960874079,
+      0.007021701196637134
+    ]
+  },
+  "ensemble": {
+    "threshold": 0.8734867572784424,
+    "val_pr_auc": 0.5010568590835999,
+    "val_f1": 0.5260416666666666,
+    "val_recall_at_1pct_fpr": 0.8021235521235521,
+    "val_precision_at_1000": 0.505,
+    "test_pr_auc": 0.441587795704509,
+    "test_f1": 0.5122463261021694,
+    "test_recall_at_1pct_fpr": 0.6569037656903766,
+    "test_precision_at_1000": 0.446,
+    "test_ach_pr_auc": 0.5056802770194103,
+    "test_ach_f1": 0.5600612088752869,
+    "test_ach_recall_at_1pct_fpr": 0.5815347721822542,
+    "test_ach_precision_at_1000": 0.446
+  },
+  "n_features": 49,
+  "features": [
+    "log_amt",
+    "hour",
+    "is_ach",
+    "is_cross_currency",
+    "is_same_bank",
+    "is_self_transfer",
+    "is_round_amount",
+    "in_amount_band",
+    "cur_code",
+    "fmt_ACH",
+    "fmt_Bitcoin",
+    "fmt_Cash",
+    "fmt_Cheque",
+    "fmt_Credit_Card",
+    "fmt_Reinvestment",
+    "fmt_Wire",
+    "s_out_cnt_24h",
+    "s_out_cnt_7d",
+    "s_in_cnt_24h",
+    "s_in_cnt_7d",
+    "s_out_sum_24h",
+    "s_out_sum_7d",
+    "s_in_sum_24h",
+    "s_in_sum_7d",
+    "s_out_mean_7d",
+    "s_in_mean_7d",
+    "s_uniq_out",
+    "s_uniq_in",
+    "s_tot_out",
+    "s_tot_in",
+    "s_gap_s",
+    "d_out_cnt_24h",
+    "d_out_cnt_7d",
+    "d_in_cnt_24h",
+    "d_in_cnt_7d",
+    "d_out_sum_24h",
+    "d_out_sum_7d",
+    "d_in_sum_24h",
+    "d_in_sum_7d",
+    "d_out_mean_7d",
+    "d_in_mean_7d",
+    "d_uniq_out",
+    "d_uniq_in",
+    "d_tot_out",
+    "d_tot_in",
+    "d_gap_s",
+    "has_reverse_before",
+    "s_pagerank",
+    "d_pagerank"
+  ]
+}

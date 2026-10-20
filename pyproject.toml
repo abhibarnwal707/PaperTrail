@@ -7,9 +7,12 @@ dependencies = ["polars>=1.0", "numpy", "scikit-learn", "xgboost", "shap", "mlfl
 [project.optional-dependencies]
 gnn   = ["torch"]
 agent = ["langgraph", "langchain-core", "pydantic"]
-api   = ["fastapi", "uvicorn"]
-dev   = ["pytest", "ruff"]
+api   = ["fastapi", "uvicorn", "pydantic"]
+dev   = ["pytest", "ruff", "httpx"]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+extend-exclude = ["notebooks"]   # Kaggle notebook cells are not linted
