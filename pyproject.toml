@@ -8,6 +8,7 @@ dependencies = ["polars>=1.0", "numpy", "scikit-learn", "xgboost", "shap", "mlfl
 gnn   = ["torch"]
 agent = ["langgraph", "langchain-core", "pydantic"]
 api   = ["fastapi", "uvicorn", "pydantic"]
+app   = ["streamlit>=1.46", "plotly"]
 dev   = ["pytest", "ruff", "httpx"]
 
 [build-system]
@@ -20,3 +21,6 @@ extend-exclude = ["notebooks"]   # Kaggle notebook cells are not linted
 [tool.pytest.ini_options]
 pythonpath = ["."]   # lets tests import the top-level `api` package when run as plain `pytest` (as CI does)
 testpaths = ["tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/viz.py" = ["C408"]   # plotly layouts read better as dict(...)

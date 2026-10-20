@@ -14,3 +14,6 @@ logs/
 reports/*_scores.parquet
 reports/*.pt
 reports/xgb_v2_final_seed*.json
+
+# design inspection screenshots and reports
+.taste-skill/

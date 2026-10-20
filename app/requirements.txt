@@ -1,0 +1,5 @@
+streamlit>=1.46
+polars>=1.0
+plotly>=5.20
+numpy
+xgboost>=2.0
