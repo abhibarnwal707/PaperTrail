@@ -132,6 +132,24 @@ def queue_findings(b: Bundle, model: str) -> dict:
             "top": a.sort(f"{model}_rank")["account"][0]}
 
 
+def risk_tier(b: Bundle, model: str, risk: float) -> str:
+    """Critical / High / Watch from how far the account's riskiest payment sits above the model's alert line (z units)."""
+    margin = risk - b.metrics["thresholds_z"][model]
+    return "Critical" if margin >= 1.0 else "High" if margin >= 0 else "Watch"
+
+
+def tier_counts(b: Bundle, model: str) -> dict:
+    tiers = [risk_tier(b, model, r) for r in b.alerts[f"{model}_risk"].to_list()]
+    return {t: tiers.count(t) for t in ("Critical", "High", "Watch")}
+
+
+def hourly_activity(b: Bundle, model: str) -> pl.DataFrame:
+    """Payments per hour in the test window and how many of them the model flags."""
+    t = b.txns.filter(pl.col("split") == "test")
+    return (t.group_by(pl.col("ts").dt.truncate("1h").alias("hour"))
+            .agg(pl.len().alias("payments"), pl.col(f"{model}_flag").sum().alias("flagged")).sort("hour"))
+
+
 def model_findings(b: Bundle) -> dict:
     """The facts the model page's title row states, taken from metrics.json."""
     m = b.metrics["models"]

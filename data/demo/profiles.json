@@ -1,0 +1,155 @@
+{
+ "profiles": {
+  "new_account": {
+   "description": "A brand-new account with no earlier activity",
+   "n_rows": 68803,
+   "laundering_rate": 0.0005668357484412017,
+   "features": {
+    "s_out_cnt_24h": 0.0,
+    "s_out_cnt_7d": 0.0,
+    "s_in_cnt_24h": 0.0,
+    "s_in_cnt_7d": 0.0,
+    "s_out_sum_24h": 0.0,
+    "s_out_sum_7d": 0.0,
+    "s_in_sum_24h": 0.0,
+    "s_in_sum_7d": 0.0,
+    "s_out_mean_7d": null,
+    "s_in_mean_7d": null,
+    "s_uniq_out": 0.0,
+    "s_uniq_in": 0.0,
+    "s_tot_out": 0.0,
+    "s_tot_in": 0.0,
+    "s_gap_s": null,
+    "s_pagerank": 0.1844837911286585,
+    "has_reverse_before": 0.0
+   }
+  },
+  "typical_customer": {
+   "description": "A typical customer: at most one payment in the last day, a few regular recipients",
+   "n_rows": 456616,
+   "laundering_rate": 0.0024812971950172575,
+   "features": {
+    "s_out_cnt_24h": 0.0,
+    "s_out_cnt_7d": 7.0,
+    "s_in_cnt_24h": 0.0,
+    "s_in_cnt_7d": 6.0,
+    "s_out_sum_24h": 0.0,
+    "s_out_sum_7d": 57204.015,
+    "s_in_sum_24h": 0.0,
+    "s_in_sum_7d": 72347.0,
+    "s_out_mean_7d": 8114.681818181818,
+    "s_in_mean_7d": 13539.513333333334,
+    "s_uniq_out": 2.0,
+    "s_uniq_in": 2.0,
+    "s_tot_out": 7.0,
+    "s_tot_in": 6.0,
+    "s_gap_s": 34320.0,
+    "s_pagerank": 0.3377107231735675,
+    "has_reverse_before": 0.0
+   }
+  },
+  "busy_business": {
+   "description": "A busy business: at least 521 payments in the last 24 hours (top 10%)",
+   "n_rows": 206523,
+   "laundering_rate": 0.0013799915747882802,
+   "features": {
+    "s_out_cnt_24h": 8737.0,
+    "s_out_cnt_7d": 30022.0,
+    "s_in_cnt_24h": 0.0,
+    "s_in_cnt_7d": 248.0,
+    "s_out_sum_24h": 2688363485.84,
+    "s_out_sum_7d": 18307398186.38,
+    "s_in_sum_24h": 0.0,
+    "s_in_sum_7d": 126966.95,
+    "s_out_mean_7d": 517020.3286813531,
+    "s_in_mean_7d": 439.9953944954128,
+    "s_uniq_out": 8846.0,
+    "s_uniq_in": 248.0,
+    "s_tot_out": 30026.0,
+    "s_tot_in": 248.0,
+    "s_gap_s": 0.0,
+    "s_pagerank": 7.138844666978795,
+    "has_reverse_before": 0.0
+   }
+  },
+  "rapid_sender": {
+   "description": "A rapid sender: 5 or more payments in the last day, the latest within 2 minutes",
+   "n_rows": 333369,
+   "laundering_rate": 0.0013858517138666162,
+   "features": {
+    "s_out_cnt_24h": 1538.0,
+    "s_out_cnt_7d": 4912.0,
+    "s_in_cnt_24h": 2.0,
+    "s_in_cnt_7d": 42.0,
+    "s_out_sum_24h": 647158573.9699999,
+    "s_out_sum_7d": 4748908716.68,
+    "s_in_sum_24h": 1033.2299999999998,
+    "s_in_sum_7d": 168804.12,
+    "s_out_mean_7d": 416341.2526796592,
+    "s_in_mean_7d": 848.07625,
+    "s_uniq_out": 1182.0,
+    "s_uniq_in": 42.0,
+    "s_tot_out": 4912.0,
+    "s_tot_in": 42.0,
+    "s_gap_s": 0.0,
+    "s_pagerank": 0.8642599218085971,
+    "has_reverse_before": 0.0
+   }
+  },
+  "dormant_returning": {
+   "description": "A dormant account returning after 2+ days of silence",
+   "n_rows": 39350,
+   "laundering_rate": 0.006226175349428208,
+   "features": {
+    "s_out_cnt_24h": 0.0,
+    "s_out_cnt_7d": 3.0,
+    "s_in_cnt_24h": 0.0,
+    "s_in_cnt_7d": 2.0,
+    "s_out_sum_24h": 0.0,
+    "s_out_sum_7d": 20042.41,
+    "s_in_sum_24h": 0.0,
+    "s_in_sum_7d": 13251.64,
+    "s_out_mean_7d": 6420.3213888888895,
+    "s_in_mean_7d": 6272.674999999999,
+    "s_uniq_out": 2.0,
+    "s_uniq_in": 1.0,
+    "s_tot_out": 3.0,
+    "s_tot_in": 2.0,
+    "s_gap_s": 249240.0,
+    "s_pagerank": 0.475722239926628,
+    "has_reverse_before": 0.0
+   }
+  }
+ },
+ "receiver_default": {
+  "d_out_cnt_24h": 0.0,
+  "d_out_cnt_7d": 3.0,
+  "d_in_cnt_24h": 2.0,
+  "d_in_cnt_7d": 9.0,
+  "d_out_sum_24h": 0.0,
+  "d_out_sum_7d": 72305.95,
+  "d_in_sum_24h": 3088.6099999999997,
+  "d_in_sum_7d": 150207.08,
+  "d_out_mean_7d": 18919.69761904762,
+  "d_in_mean_7d": 15772.408333333333,
+  "d_uniq_out": 2.0,
+  "d_uniq_in": 3.0,
+  "d_tot_out": 3.0,
+  "d_tot_in": 9.0,
+  "d_gap_s": 1200.0,
+  "d_pagerank": 0.6078913625232718
+ },
+ "sliders": {
+  "s_out_cnt_24h": {
+   "min": 0.0,
+   "max": 22494.0,
+   "default": 4.0
+  },
+  "s_uniq_out": {
+   "min": 0.0,
+   "max": 14230.0,
+   "default": 4.0
+  }
+ },
+ "note": "Illustrative scenarios: medians of training rows that match each description. They are not real accounts."
+}

@@ -57,3 +57,9 @@ def test_what_if_responds_to_changed_inputs(run):
     _ok(at)
     at.number_input[0].set_value(100.0).run()
     _ok(at)
+
+
+@pytest.mark.parametrize("page", PAGES)
+def test_every_page_renders_in_the_light_theme(run, page):
+    _ok(run(page=page, theme="light"))
+    _ok(run(page=page, theme="no-such-theme"))

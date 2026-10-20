@@ -1,0 +1,16 @@
+{
+ "recipe": {
+  "w_gnn": 0.4,
+  "gnn_mu": -12.954259872436523,
+  "gnn_sd": 4.56065034866333,
+  "xgb_mu": -7.813576698303223,
+  "xgb_sd": 2.1917693614959717,
+  "threshold": 3.8862104415893555
+ },
+ "thresholds_z": {
+  "xgb": 4.44650936126709,
+  "gnn": 3.3443918228149414,
+  "blend": 3.8862104415893555
+ },
+ "note": "z = (logit(p) - mu) / sd with the validation constants; blend = w_gnn * gnn_z + (1 - w_gnn) * xgb_z"
+}

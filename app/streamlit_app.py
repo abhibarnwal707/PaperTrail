@@ -16,13 +16,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import logic, theme, viz
 
 st.set_page_config(page_title="PaperTrail", layout="wide", initial_sidebar_state="auto")
-st.markdown(f"<style>{theme.CSS}</style>", unsafe_allow_html=True)
 
 DEMO_DIR = Path(os.environ.get("PAPERTRAIL_DEMO_DIR", Path(__file__).resolve().parents[1] / "data" / "demo"))
-PAGES = {"queue": "Alert queue", "account": "Investigate", "try": "Try a transaction", "models": "Models", "about": "About"}
-SHORT = {"blend": "the blend", "xgb": "XGBoost", "gnn": "the GNN"}
+PAGES = {"queue": "Alerts", "account": "Investigate", "try": "Simulator", "models": "Models", "about": "About"}
+SEG = {"blend": "Blend", "xgb": "XGBoost", "gnn": "GNN"}
 PLOT = {"displayModeBar": False}
-PER_PAGE = 50
+PER_PAGE = 25
 PROFILE_NAMES = {"new_account": "New account", "typical_customer": "Typical customer", "busy_business": "Busy business", "rapid_sender": "Rapid sender", "dormant_returning": "Dormant, returning"}
 
 
@@ -36,63 +35,93 @@ def view_state() -> dict:
     page = q.get("page", "queue")
     model = q.get("model", "blend")
     s = {"page": page if page in PAGES else "queue", "model": model if model in logic.MODELS else "blend"}
+    if q.get("theme") in theme.THEMES and q.get("theme") != "dark":
+        s["theme"] = q.get("theme")
     for k in ("account", "reveal", "p"):
         if q.get(k):
             s[k] = q.get(k)
     return s
 
 
-def fmt_money(x: float, sign: str = "") -> str:
-    return f"{sign}{x:,.2f}"
+def html(s: str) -> None:
+    st.markdown(s, unsafe_allow_html=True)
 
 
 def plot(fig) -> None:
     st.plotly_chart(fig, width="stretch", config=PLOT, theme=None)
 
 
+def tools(S: dict, *extra: str) -> str:
+    """The header's right side: the model switch (where it applies), page actions, then the light/dark switch."""
+    return "".join(extra) + theme.theme_button(S)
+
+
+def crumb(S: dict, *parts: str) -> str:
+    return theme.link(theme.href(S, page="queue", account=None, reveal=None, p=None), "Alerts") + "".join(f"<span>/</span><span>{theme.esc(p)}</span>" for p in parts)
+
+
 # ------------------------------------------------------------------ pages
 def page_queue(b: logic.Bundle, S: dict) -> None:
     model = S["model"]
     f = logic.queue_findings(b, model)
-    sub = (f"<b>{f['flagged'][model]}</b> of <b>{f['accounts']}</b> accounts carry at least one flagged payment under {SHORT[model]}. "
-           f"<b>{f['every']}</b> are flagged by every model; <b>{f['gnn_only']}</b> are caught by the GNN but not by XGBoost.")
-    st.markdown(theme.title_row("Alert queue", sub, theme.button("Open the top account", theme.href(S, page="account", account=f["top"]))), unsafe_allow_html=True)
-    st.markdown(theme.kpi_strip([
-        ("Accounts in the queue", f"{f['accounts']}", "test window Sep 9-10, 2022"),
-        (f"Flagged by {SHORT[model]}", f"{f['flagged'][model]}", f"of {f['accounts']} accounts"),
-        ("Flagged by every model", f"{f['every']}", "blend, XGBoost and GNN agree"),
-        ("GNN only", f"{f['gnn_only']}", "missed by XGBoost"),
-    ]), unsafe_allow_html=True)
+    tiers = logic.tier_counts(b, model)
+    html(theme.header("Alert queue", f"{f['accounts']} accounts · {b.metrics['test_window'].replace(' to ', ' – ')}",
+                      tools(S, theme.seg(S, SEG), theme.button("Open top alert", theme.href(S, page="account", account=f["top"], reveal=None, p=None), ic="next"))))
+    flagged = f["flagged"][model]
+    html(theme.kpi_cards([
+        {"label": "Accounts in queue", "value": f"{f['accounts']}", "ic": "users", "foot": theme.pill(f"{tiers['Critical']} critical", "coral")},
+        {"label": "Flagged", "value": f"{flagged}<small>/ {f['accounts']}</small>", "ic": "flag", "bar": flagged / f["accounts"], "color": theme.MODEL_VAR[model],
+         "hint": "Accounts with at least one payment above the alert line."},
+        {"label": "All models agree", "value": f"{f['every']}", "ic": "check", "foot": "blend, XGBoost and GNN", "hint": "Flagged by all three models."},
+        {"label": "Caught only by graph", "value": f"{f['gnn_only']}", "ic": "graph", "foot": theme.pill("GNN only", "lime", dot=False),
+         "hint": "Flagged by the GNN, missed by XGBoost."},
+    ]))
+
+    c1, c2 = st.columns([4, 8], gap="medium")
+    with c1, st.container(border=True):
+        html(theme.card_head("Risk mix", hint="Critical: the riskiest payment is far above the alert line. High: just above it. Watch: below it."))
+        tier_colors = [P["coral"], P["amber"], P["watch"]]
+        plot(viz.donut(list(tiers), list(tiers.values()), tier_colors, str(f["accounts"]), "accounts", P))
+        html(theme.legend([(k, v, c) for (k, v), c in zip(tiers.items(), tier_colors)]))
+    with c2, st.container(border=True):
+        act = logic.hourly_activity(b, model)
+        html(theme.card_head("Payment activity", "Per hour, demo slice", f'<span class="legend"><span><span class="d" style="background:var(--muted)"></span>payments<b>{int(act["payments"].sum())}</b></span>'
+                             f'<span><span class="d" style="background:{theme.MODEL_VAR[model]}"></span>flagged<b>{int(act["flagged"].sum())}</b></span></span>'))
+        plot(viz.activity_area(act, model, P))
 
     reveal = S.get("reveal") == "1"
-    t = logic.alert_table(b, model, reveal)
+    a = b.alerts.sort(f"{model}_rank")
     page = max(1, int(S["p"])) if S.get("p", "").isdigit() else 1
-    lo, hi = (page - 1) * PER_PAGE, min(page * PER_PAGE, t.height)
-    toggle = (f'<a target="_self" href="{theme.esc(theme.href(S, reveal=None, p=None))}">hide</a>' if reveal
-              else f'<a class="off" target="_self" href="{theme.esc(theme.href(S, reveal=1, p=None))}">show</a>')
-    st.markdown(f'<div class="tools"><span class="num">{lo + 1}-{hi} of {t.height}</span><span>Answers (which accounts really were laundering): {toggle}</span></div>', unsafe_allow_html=True)
-
-    flags = b.alerts.select("account", f"n_flag_{model}").to_dict(as_series=False)
-    flag_of = dict(zip(flags["account"], flags[f"n_flag_{model}"]))
-    cols = [("rank", "Rank", "num dim"), ("acct", "Account", "id"), ("risk", "How risky", "dim"), ("flag", "Flagged payments", "num"), ("why", "Why it stands out", "wrap")]
-    if reveal:
-        cols += [("n_l", "Laundering payments", "num"), ("pat", "True pattern", "dim"), ("tag", "Picked for the demo because", "dim")]
+    lo, hi = (page - 1) * PER_PAGE, min(page * PER_PAGE, a.height)
+    if lo >= a.height:
+        lo, hi, page = 0, min(PER_PAGE, a.height), 1
     rows = []
-    for r in t.slice(lo, hi - lo).to_dicts():
-        a = r["Account"]
-        mark = '<span class="flagmark"></span>' if flag_of[a] else ""
-        row = {"rank": r["Rank"], "acct": f'{mark}<a target="_self" href="{theme.esc(theme.href(S, page="account", account=a, reveal=None, p=None))}">{theme.esc(a)}</a>',
-               "risk": theme.esc(r["How risky"]), "flag": f'{r["Flagged transactions"]} / {r["Transactions in window"]}', "why": theme.esc(r["Why it stands out"])}
+    for r in a.slice(lo, hi - lo).to_dicts():
+        acct = r["account"]
+        pct = logic.risk_percent_text(logic.risk_percentile(b, model, r[f"{model}_risk"]))
+        reasons = logic.account_reasons(b, acct, top=2).to_dicts()
+        row = {"rank": f'<span class="rk">{r[f"{model}_rank"]:02d}</span>',
+               "acct": theme.link(theme.href(S, page="account", account=acct, reveal=None, p=None), theme.esc(acct)),
+               "tier": theme.tier_pill(logic.risk_tier(b, model, r[f"{model}_risk"]), title=f"riskiest payment: {pct} of the window"),
+               "flag": theme.meter(r[f"n_flag_{model}"], r["n_txn"]),
+               "sig": theme.chips([(x["label"], x["contribution"] > 0, f'{x["value_text"]} ({x["contribution"]:+.2f})') for x in reasons]),
+               "mods": theme.model_dots({m: r[f"n_flag_{m}"] > 0 for m in ("blend", "xgb", "gnn")})}
         if reveal:
-            row.update(n_l=r["Actually laundering (transactions)"], pat=theme.esc(r["True pattern"] or "none"), tag=theme.esc(r["Why it was picked for the demo"]))
+            row["truth"] = (theme.pill(r["typologies_truth"] or "Laundering", "coral") if r["n_laundering"] else theme.pill("Clean", "mint"))
         rows.append(row)
-    st.markdown(theme.table(cols, rows), unsafe_allow_html=True)
+    cols = [("rank", "#", "dim"), ("acct", "Account", "id"), ("tier", "Risk", "text"), ("flag", "Flagged", "text"), ("sig", "Top signals", "text"), ("mods", "B · X · G", "text")]
+    if reveal:
+        cols.append(("truth", "Ground truth", "text"))
+    with st.container(border=True):
+        html(theme.card_head("Accounts", f"{lo + 1}–{hi} of {a.height}, riskiest first",
+                             theme.toggle("Ground truth", reveal, theme.href(S, reveal=None if reveal else 1, p=None))))
+        html(theme.table(cols, rows))
     pager = []
     if page > 1:
-        pager.append(f'<a target="_self" href="{theme.esc(theme.href(S, p=page - 1))}">Previous</a>')
-    if hi < t.height:
-        pager.append(f'<a target="_self" href="{theme.esc(theme.href(S, p=page + 1))}">Next {min(PER_PAGE, t.height - hi)}</a>')
-    st.markdown(f'<div class="pager"><span>How risky: where the account\'s riskiest payment ranks among all payments in the window.</span><span>{" · ".join(pager)}</span></div>', unsafe_allow_html=True)
+        pager.append(theme.link(theme.href(S, p=page - 1), "← Previous"))
+    if hi < a.height:
+        pager.append(theme.link(theme.href(S, p=page + 1), "Next →"))
+    html(f'<div class="pager"><span>Page {page} of {(a.height - 1) // PER_PAGE + 1}</span><span class="pg">{"".join(pager)}</span></div>')
 
 
 def page_account(b: logic.Bundle, S: dict) -> None:
@@ -102,157 +131,160 @@ def page_account(b: logic.Bundle, S: dict) -> None:
     row = b.alerts.filter(pl.col("account") == account).to_dicts()[0]
     rank = row[f"{model}_rank"]
     nxt = order[rank] if rank < len(order) else None
-    sub = (f"Ranked <b>#{rank}</b> of <b>{len(order)}</b> by {SHORT[model]}. <b>{row[f'n_flag_{model}']}</b> of <b>{row['n_txn']}</b> payments in the window are flagged.")
-    actions = theme.button("Back to the queue", theme.href(S, page="queue", account=None), "ghost") + " " + (theme.button("Next account", theme.href(S, account=nxt)) if nxt else "")
-    st.markdown(theme.title_row(account, sub, actions, mono=True), unsafe_allow_html=True)
-    cells = [(logic.MODELS[m], f'#{row[f"{m}_rank"]}<small>of {len(order)}</small>', f'{row[f"n_flag_{m}"]} flagged of {row["n_txn"]}', m == model) for m in ("blend", "xgb", "gnn")]
-    st.markdown(theme.kpi_strip(cells), unsafe_allow_html=True)
+    tier = logic.risk_tier(b, model, row[f"{model}_risk"])
+    reveal = S.get("reveal") == "1"
+    right = tools(S, theme.seg(S, SEG), theme.button("Next", theme.href(S, account=nxt, reveal=None), ic="next") if nxt else "")
+    html(theme.header(account, "", right, crumb=crumb(S, "Investigate"), mono=True, badge=theme.tier_pill(tier, big=True)))
+
+    cards = []
+    for m in ("blend", "xgb", "gnn"):
+        pct = logic.risk_percent_text(logic.risk_percentile(b, m, row[f"{m}_risk"]))
+        cards.append({"label": SEG[m], "value": f'#{row[f"{m}_rank"]}<small>/ {len(order)}</small>', "ic": {"blend": "layers", "xgb": "target", "gnn": "graph"}[m],
+                      "foot": theme.meter(row[f"n_flag_{m}"], row["n_txn"]) + f'<span class="mono">{pct}</span>', "on": m == model})
+    html(theme.kpi_cards(cards, cols=3))
 
     reasons = logic.account_reasons(b, account)
-    pos, rows = logic.ring_layout(logic.account_edges(b, account), account)
-    with st.container(border=True):
-        left, right = st.columns([5, 7], gap="large")
-        with left:
-            st.markdown(theme.card_title("Why it stands out", "The account's riskiest payment. Each line says how far a fact pushed its score up (amber) or down (grey)."), unsafe_allow_html=True)
-            st.markdown(theme.reasons_list(reasons, 8), unsafe_allow_html=True)
-            st.markdown('<div class="note" style="margin-top:12px">These reasons come from the XGBoost models. The GNN judges the web of payments around the account instead: see the network.</div>', unsafe_allow_html=True)
-        with right:
-            st.markdown(theme.card_title("Who it pays and who pays it", f"The account is the white dot; amber lines are payments {SHORT[model]} flags. Up to 150 payments, riskiest first."), unsafe_allow_html=True)
-            plot(viz.network_figure(pos, rows, account, model))
+    pos, edges = logic.ring_layout(logic.account_edges(b, account), account)
+    c1, c2 = st.columns([7, 5], gap="medium")
+    with c1, st.container(border=True):
+        html(theme.card_head("Payment network", f"{len(pos) - 1} counterparties", ic="graph", hint="Inner ring: direct counterparties. Outer ring: their counterparties. Coral: payments the selected model flags."))
+        plot(viz.network_figure(pos, edges, account, model, P))
+    with c2, st.container(border=True):
+        html(theme.card_head("Why it's flagged", "Riskiest payment · XGBoost", ic="target", hint="How far each fact pushed the score up (coral) or down (grey)."))
+        html(theme.reasons_list(reasons, 8))
 
     h = logic.account_history(b, account)
-    tape_rows = []
-    for r in h.to_dicts():
-        out = r["direction"] == "sent"
-        pct = r.get(f"{model}_pct")
-        mark = '<span class="flagmark"></span>' if r.get(f"{model}_flag") else ""
-        tape_rows.append({"when": str(r["ts"])[:16], "dir": r["direction"], "other": theme.esc(r["counterparty"]), "paid": theme.esc(r["pay_format"]),
-                          "amt": fmt_money(r["amt_paid"], "-" if out else "+"), "risk": "-" if pct is None else logic.risk_percent_text(pct), "flag": mark})
-    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
-    st.markdown(theme.card_title("Transaction tape", f"The last {h.height} payments, newest first. A 1px amber mark means {SHORT[model]} flags the payment. Minus is money out, plus is money in."), unsafe_allow_html=True)
-    st.markdown(theme.table([("flag", "", "id"), ("when", "When", "dim"), ("dir", "", "dim"), ("other", "Other account", "id"), ("paid", "Paid by", "dim"),
-                             ("amt", "Amount", "num"), ("risk", "How risky", "num dim")], tape_rows, cls="tape"), unsafe_allow_html=True)
-
-    reveal = S.get("reveal") == "1"
-    ans = (f'<span>Laundering payments in the window: <b>{row["n_laundering"]}</b>. True pattern: <b>{theme.esc(row["typologies_truth"] or "none")}</b>. '
-           f'Picked for the demo because: <b>{theme.esc(row["tag"])}</b>. <a target="_self" href="{theme.esc(theme.href(S, reveal=None))}">hide</a></span>' if reveal
-           else f'<span>Answer: <a class="off" target="_self" href="{theme.esc(theme.href(S, reveal=1))}">show whether this account really was laundering</a></span>')
-    st.markdown(f'<div class="tools" style="margin-top:16px">{ans}</div>', unsafe_allow_html=True)
-    st.markdown('<div class="empty" style="margin-top:8px">A written case summary will appear here once the investigator agent is added.</div>', unsafe_allow_html=True)
+    html('<div class="gap"></div>')
+    with st.container(border=True):
+        html(theme.card_head("Activity", f"Last {h.height} payments", ic="clock",
+                             right=theme.toggle("Ground truth", reveal, theme.href(S, reveal=None if reveal else 1))))
+        plot(viz.timeline(h, model, P))
+        tape = []
+        for r in h.to_dicts():
+            out = r["direction"] == "sent"
+            pct = r.get(f"{model}_pct")
+            tape.append({"dir": f'<span class="dir {"out" if out else "in"}">{theme.icon("out" if out else "in")}</span>',
+                         "when": f'<span class="mono">{str(r["ts"])[5:16]}</span>', "other": theme.esc(r["counterparty"]), "paid": theme.esc(r["pay_format"]),
+                         "amt": f'<span class="{"" if out else "amt-in"}">{"-" if out else "+"}{r["amt_paid"]:,.2f}</span>',
+                         "risk": theme.pill("Flagged", "coral") if r.get(f"{model}_flag") else theme.pill("—" if pct is None else logic.risk_percent_text(pct), "grey", dot=False)})
+        html(theme.table([("dir", "", "text"), ("when", "When", "dim"), ("other", "Counterparty", "id"), ("paid", "Method", "dim"), ("amt", "Amount", "num"), ("risk", "Risk", "text")], tape))
+    if reveal:
+        truth = theme.pill(f'Laundering · {row["typologies_truth"]}' if row["n_laundering"] else "Clean account", "coral" if row["n_laundering"] else "mint", big=True)
+        html(f'<div class="gap"></div><div class="card" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">{truth}'
+             f'<span class="note"><b>{row["n_laundering"]}</b> laundering payments in the window · picked as <b>{theme.esc(row["tag"])}</b></span></div>')
+    html('<div class="gap"></div>' + theme.ai_placeholder())
 
 
 def page_try(b: logic.Bundle, S: dict) -> None:
-    st.markdown(theme.title_row("Try a transaction", "Describe a payment and the sender, and see whether the model would raise an alert. The sender's history comes from a profile you pick."), unsafe_allow_html=True)
+    html(theme.header("Simulator", "Describe a payment, see if XGBoost would alert", tools(S)))
     if not b.boosters:
-        st.markdown('<div class="empty">The XGBoost models could not be loaded here, so scoring is unavailable.</div>', unsafe_allow_html=True)
+        html('<div class="empty">The XGBoost models could not be loaded here, so scoring is unavailable.</div>')
         return
-    if S["model"] != "xgb":
-        st.markdown('<div class="note" style="margin-bottom:16px">Scoring a made-up payment always uses XGBoost. The GNN needs the real payment network around real accounts, so its scores exist only for real transactions in the queue.</div>', unsafe_allow_html=True)
     cat = b.categories
-    with st.container(border=True):
-        left, right = st.columns([5, 7], gap="large")
-        with left:
-            st.markdown(theme.card_title("The payment"), unsafe_allow_html=True)
-            amount = st.number_input("Amount", min_value=1.0, max_value=1e9, value=9500.0, step=100.0)
-            c1, c2 = st.columns(2)
-            fmt = c1.selectbox("How it is paid", cat["pay_format"], index=cat["pay_format"].index("ACH") if "ACH" in cat["pay_format"] else 0)
-            cur = c2.selectbox("Currency", list(cat["currencies"]), index=list(cat["currencies"]).index("US Dollar") if "US Dollar" in cat["currencies"] else 0)
-            diff = st.checkbox("The receiver is paid in a different currency")
-            same_bank = st.checkbox("Sender and receiver use the same bank")
-            hour = st.slider("Hour of the day", 0, 23, 14)
-            st.markdown('<div style="height:12px"></div>' + theme.card_title("The sender"), unsafe_allow_html=True)
-            names = list(b.profiles["profiles"])
-            profile = st.selectbox("What kind of account is it?", names, format_func=lambda n: PROFILE_NAMES.get(n, n.replace("_", " ").capitalize()))
-            p = b.profiles["profiles"][profile]
-            st.markdown(f'<div class="note" style="margin:-4px 0 10px 0">{theme.esc(p["description"])}. In the training data, <b class="num">{p["laundering_rate"] * 100:.2f}%</b> of payments from accounts like this were laundering (<span class="num">{p["n_rows"]:,}</span> examples).</div>', unsafe_allow_html=True)
-            sl, new = b.profiles["sliders"], profile == "new_account"
-            n24 = st.slider("Payments the sender made in the last 24 hours", 0, int(max(sl["s_out_cnt_24h"]["max"], 1)), int(sl["s_out_cnt_24h"]["default"]) if not new else 0, disabled=new)
-            uq = st.slider("Different people the sender has paid so far", 0, int(max(sl["s_uniq_out"]["max"], 1)), int(sl["s_uniq_out"]["default"]) if not new else 0, disabled=new)
-        feats = logic.whatif_features(b, amount=float(amount), pay_format=fmt, pay_currency=cur, different_receive_currency=diff, same_bank=same_bank,
-                                      hour=hour, profile=profile, out_cnt_24h=n24, uniq_out=uq)
-        res = logic.score_features(b, feats)
-        with right:
-            st.markdown(theme.card_title("Result"), unsafe_allow_html=True)
-            on = "on" if res["alert"] else ""
-            verdict = "Alert" if res["alert"] else "No alert"
-            sub = "The model would flag this payment for review." if res["alert"] else "The model would let this payment through."
-            st.markdown(f'<div class="verdict {on}">{verdict}</div><div class="note" style="margin-top:2px">{sub}</div>'
-                        f'<div style="display:flex;align-items:baseline;gap:12px;margin-top:14px"><span class="score-fig">{res["probability"]:.2f}</span><span class="note">model score</span></div>'
-                        f'{theme.score_bar(res["probability"], res["threshold"])}', unsafe_allow_html=True)
-            st.markdown('<div class="card-title" style="margin-top:22px">What drove it</div>', unsafe_allow_html=True)
-            st.markdown(theme.reasons_list(res["reasons"], 6), unsafe_allow_html=True)
-            st.markdown('<div class="note" style="margin-top:12px">An illustration, not a real account: the sender\'s history is the typical history of the chosen kind of account. The score ranks payments; it is not a probability. The data is synthetic.</div>', unsafe_allow_html=True)
-    with st.expander("The technical details: every number sent to the model"):
+    left, right = st.columns([5, 7], gap="medium")
+    with left, st.container(border=True):
+        html(theme.card_head("Payment", ic="out"))
+        amount = st.number_input("Amount", min_value=1.0, max_value=1e9, value=9500.0, step=100.0)
+        c1, c2 = st.columns(2)
+        fmt = c1.selectbox("Method", cat["pay_format"], index=cat["pay_format"].index("ACH") if "ACH" in cat["pay_format"] else 0)
+        cur = c2.selectbox("Currency", list(cat["currencies"]), index=list(cat["currencies"]).index("US Dollar") if "US Dollar" in cat["currencies"] else 0)
+        hour = st.slider("Hour of day", 0, 23, 14)
+        c3, c4 = st.columns(2)
+        diff = c3.toggle("Cross-currency")
+        same_bank = c4.toggle("Same bank")
+        html('<div class="gap"></div>' + theme.card_head("Sender", ic="users"))
+        names = list(b.profiles["profiles"])
+        profile = st.selectbox("Profile", names, format_func=lambda n: PROFILE_NAMES.get(n, n.replace("_", " ").capitalize()), help="Illustrative: the median history of training accounts that match.")
+        p = b.profiles["profiles"][profile]
+        html(f'<div class="note" style="margin:-4px 0 10px 0">{theme.esc(p["description"])} · base rate <b class="mono">{p["laundering_rate"] * 100:.2f}%</b></div>')
+        sl, new = b.profiles["sliders"], profile == "new_account"
+        n24 = st.slider("Payments sent, last 24h", 0, int(max(sl["s_out_cnt_24h"]["max"], 1)), int(sl["s_out_cnt_24h"]["default"]) if not new else 0, disabled=new)
+        uq = st.slider("Distinct recipients", 0, int(max(sl["s_uniq_out"]["max"], 1)), int(sl["s_uniq_out"]["default"]) if not new else 0, disabled=new)
+    feats = logic.whatif_features(b, amount=float(amount), pay_format=fmt, pay_currency=cur, different_receive_currency=diff, same_bank=same_bank,
+                                  hour=hour, profile=profile, out_cnt_24h=n24, uniq_out=uq)
+    res = logic.score_features(b, feats)
+    with right, st.container(border=True):
+        html(theme.card_head("Model score", "XGBoost · 3-seed average", ic="target", hint="The score ranks payments; it is not a probability. The GNN needs a real payment network, so it can't score made-up payments."))
+        plot(viz.gauge(res["probability"], res["threshold"], P))
+        html('<div class="verdict">' + (theme.pill("Alert raised", "coral", big=True) if res["alert"] else theme.pill("No alert", "mint", big=True)) + "</div>")
+        html('<div class="gap"></div>' + theme.card_head("Drivers"))
+        html(theme.reasons_list(res["reasons"], 6))
+    with st.expander("All model inputs"):
         rows = [{"f": theme.esc(r["label"]), "v": theme.esc(r["value_text"]), "e": f'{r["contribution"]:+.3f}'} for r in res["reasons"].to_dicts()]
-        st.markdown(theme.table([("f", "Feature", "text"), ("v", "Value", "num"), ("e", "Effect on the score", "num")], rows), unsafe_allow_html=True)
+        html(f'<div class="card" style="padding:0 18px">{theme.table([("f", "Feature", "text"), ("v", "Value", "num"), ("e", "Effect", "num")], rows, wrap=False)}</div>')
 
 
 def page_models(b: logic.Bundle, S: dict) -> None:
-    m, f = b.metrics, logic.model_findings(b)
-    best = SHORT[f["best_single"]]
-    sub = (f"At 1% false alarms the blend finds <b>{f['blend_recall'] * 100:.1f}%</b> of the laundering; the better single model ({best}) finds <b>{f['best_single_recall'] * 100:.1f}%</b>. "
-           f"Measured on {m['n_test_transactions']:,} payments the models never saw ({m['test_window']}), <b>{m['n_test_positives']:,}</b> of them laundering.")
-    st.markdown(theme.title_row("Models", sub), unsafe_allow_html=True)
-    names = {"rules_v1": "Simple rules", "xgb_tabular": "XGBoost, payment details only", "xgb": "XGBoost + account history", "gnn": "GNN", "blend": "Blend of GNN and XGBoost"}
-    keys = [("pr_auc", "Ranking quality (PR-AUC)"), ("f1", "Balance (F1)"), ("recall_at_1pct_fpr", "Found at 1% false alarms"), ("precision_at_1000", "Right in the top 1,000")]
-    best_of = {k: max(m["models"][n][k] for n in names if n in m["models"]) for k, _ in keys}
-    rows = []
-    for n, label in names.items():
-        if n in m["models"]:
-            rows.append({"name": theme.esc(label), **{k: f'<span class="{"best" if m["models"][n][k] == best_of[k] else "rest"}">{m["models"][n][k]:.3f}</span>' for k, _ in keys}})
-    st.markdown(theme.table([("name", "Model", "text")] + [(k, h, "num") for k, h in keys], rows), unsafe_allow_html=True)
-    st.markdown('<div class="note" style="margin:10px 0 28px 0">Higher is better everywhere; the best in each column is in bold. Only about 1 in 900 payments is laundering, so accuracy would be meaningless and is not reported. '
-                '"Found at 1% false alarms": if analysts accept reviewing 1 in 100 normal payments, how much laundering do they catch?</div>', unsafe_allow_html=True)
+    m = b.metrics
+    bl = m["models"]["blend"]
+    html(theme.header("Model performance", f"{m['n_test_transactions']:,} unseen payments · {m['n_test_positives']:,} laundering · 3-seed means", tools(S)))
 
-    with st.container(border=True):
-        left, right = st.columns([6, 6], gap="large")
-        with left:
-            st.markdown(theme.card_title("Precision against recall", "Higher and further right is better. Amber is the blend."), unsafe_allow_html=True)
-            plot(viz.pr_curves(m, {k: names[k] for k in ("blend", "xgb", "gnn", "xgb_tabular") if k in m["pr_curves"]}))
-        with right:
-            st.markdown(theme.card_title("Which kinds of laundering are found", "Share found at each model's own alert level; the best is in bold."), unsafe_allow_html=True)
-            trows = []
-            for r in sorted(m["typology_recall"], key=lambda r: (r["typology"] == "UNMAPPED", -r["n"])):
-                vals = {k: r[f"recall_{k}"] for k in ("xgb", "gnn", "blend")}
-                top = max(vals.values())
-                trows.append({"t": theme.esc("No known pattern" if r["typology"] == "UNMAPPED" else r["typology"].title()), "n": r["n"],
-                              **{k: f'<span class="{"best" if v == top else "rest"}">{v * 100:.0f}%</span>' for k, v in vals.items()}})
-            st.markdown(theme.table([("t", "Pattern", "text"), ("n", "Cases", "num dim"), ("xgb", "XGBoost", "num"), ("gnn", "GNN", "num"), ("blend", "Blend", "num")], trows, wrap=False), unsafe_allow_html=True)
+    def delta(k: str, pct: bool = False) -> str:
+        d = bl[k] - max(m["models"]["xgb"][k], m["models"]["gnn"][k])
+        return theme.pill(f"{d * 100:+.1f} pts" if pct else f"{d:+.3f}", "lime" if d > 0 else "grey", dot=False) + "<span>vs best single</span>"
 
+    html(theme.kpi_cards([
+        {"label": "PR-AUC", "value": f"{bl['pr_auc']:.3f}", "ic": "target", "foot": delta("pr_auc"), "hint": "Ranking quality across all alert levels. Random is about 0.001."},
+        {"label": "F1", "value": f"{bl['f1']:.3f}", "ic": "layers", "foot": delta("f1"), "hint": "Balance of right alerts and found cases at the chosen alert line."},
+        {"label": "Recall at 1% FPR", "value": f"{bl['recall_at_1pct_fpr'] * 100:.1f}<small>%</small>", "ic": "flag", "foot": delta("recall_at_1pct_fpr", True),
+         "bar": bl["recall_at_1pct_fpr"], "hint": "Share of laundering found if analysts review 1 in 100 normal payments."},
+        {"label": "Precision, top 1,000", "value": f"{bl['precision_at_1000'] * 100:.1f}<small>%</small>", "ic": "check", "foot": delta("precision_at_1000", True),
+         "bar": bl["precision_at_1000"], "hint": "Share of the 1,000 highest-scored payments that really are laundering."},
+    ]))
+    order = ["blend", "xgb", "gnn", "xgb_tabular", "rules_v1"]
+    c1, c2 = st.columns(2, gap="medium")
+    with c1, st.container(border=True):
+        html(theme.card_head("Leaderboard", "PR-AUC, higher is better", hint="Rules and payment-only XGBoost are the baselines. Accuracy is never reported: only ~1 in 900 payments is laundering."))
+        plot(viz.leaderboard(m, "pr_auc", order, P))
+    with c2, st.container(border=True):
+        html(theme.card_head("Precision vs recall", "Test window"))
+        plot(viz.pr_curves(m, P))
+
+    c3, c4 = st.columns([7, 5], gap="medium")
+    rows = sorted(m["typology_recall"], key=lambda r: (r["typology"] == "UNMAPPED", -r["n"]))
+    with c3, st.container(border=True):
+        html(theme.card_head("Recall by pattern", "At each model's alert line", hint="Patterns come from the dataset's ground truth. About 4 in 10 laundering payments match no known pattern."))
+        plot(viz.typology_heat(rows, P))
     o = m.get("overlap_at_1pct_fpr") or {}
-    if o:
-        st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
-        with st.container(border=True):
-            st.markdown(theme.card_title("Why use two models", "Laundering payments caught at 1% false alarms, by which model catches them."), unsafe_allow_html=True)
-            st.markdown(theme.stack_bar([("both models", o.get("both", 0), "w"), ("GNN only", o.get("gnn_only", 0), "a"), ("XGBoost only", o.get("xgb_only", 0), "g"), ("neither", o.get("neither", 0), "")]), unsafe_allow_html=True)
-    st.markdown('<div class="note" style="margin-top:20px">The data is synthetic (IBM\'s AML dataset) and covers about 10 days. Roughly 4 in 10 laundering payments belong to no known pattern in the dataset; at the strict alert level the models find almost none of those. '
-                'Numbers are averages over three training runs, so differences of a few hundredths are noise. Settings such as the alert level were chosen on a separate window; the test window was scored once.</div>', unsafe_allow_html=True)
+    with c4, st.container(border=True):
+        html(theme.card_head("Why two models", "Laundering caught at 1% FPR"))
+        if o:
+            parts = [("Both", o.get("both", 0), P["neutral"]), ("GNN only", o.get("gnn_only", 0), P["violet"]), ("XGBoost only", o.get("xgb_only", 0), P["sky"]),
+                     ("Neither", o.get("neither", 0), P["watch"])]
+            plot(viz.donut([x[0] for x in parts], [x[1] for x in parts], [x[2] for x in parts], f"{(o.get('gnn_only', 0) + o.get('xgb_only', 0))}", "caught by one model", P))
+            html(theme.legend(parts))
 
 
 def page_about(b: logic.Bundle, S: dict) -> None:
     m = b.metrics
-    st.markdown(theme.title_row("About", "Find money laundering among millions of ordinary payments, and say why."), unsafe_allow_html=True)
-    with st.container(border=True):
-        c1, c2, c3 = st.columns(3, gap="large")
-        c1.markdown(theme.card_title("The problem") + '<div class="note">Banks must spot laundering in a flood of normal payments, and almost every alert they raise is a false alarm. PaperTrail ranks accounts and payments by how suspicious they look and shows the reasons, so an investigator can start with the most promising cases.</div>', unsafe_allow_html=True)
-        c2.markdown(theme.card_title("How it works") + '<div class="note">One model (XGBoost) reads each payment and the recent behaviour of both accounts. A second, a graph neural network, reads the web of payments around them, using only payments from earlier days. The blend of the two finds more laundering than either alone.</div>', unsafe_allow_html=True)
-        c3.markdown(theme.card_title("Honest limits") + '<div class="note">Synthetic data, a short time window, and a demonstration of the method. It is not a product for real banks, and the accounts you see here are not real.</div>', unsafe_allow_html=True)
-    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
-    rows = [("Data", "IBM's synthetic anti-money-laundering dataset (HI-Small): about 5.08 million payments over 18 days, roughly 0.1% of them laundering."),
-            ("Training window", "Sep 1-6, 2022. Account histories are built only from payments before each payment."),
-            ("Validation window", "Sep 7-8, 2022. Used to choose settings and alert levels."),
-            ("Test window", f"Sep 9-10, 2022: {m['n_test_transactions']:,} payments, {m['n_test_positives']:,} of them laundering. Scored once per model; this is what the console shows."),
-            ("How it is judged", "Ranking quality (PR-AUC), balance of right alerts and found cases (F1), laundering found at 1% false alarms. Never accuracy.")]
-    st.markdown(theme.table([("k", "", "id"), ("v", "", "wrap")], [{"k": theme.esc(k), "v": theme.esc(v)} for k, v in rows], wrap=True), unsafe_allow_html=True)
+    bl = m["models"]["blend"]
+    html(f'<div class="card hero"><div style="display:flex;justify-content:space-between;align-items:center">{theme.pill("Portfolio project · synthetic data", "lime")}{tools(S)}</div><h1>Find the laundering. Show why.</h1>'
+         '<p>PaperTrail ranks accounts by how suspicious their payments look, explains each score, and puts the riskiest cases first.</p></div><div class="gap"></div>')
+    html(theme.kpi_cards([
+        {"label": "Payments", "value": "5.08<small>M</small>", "ic": "db", "foot": "IBM AML · HI-Small"},
+        {"label": "Laundering rate", "value": "0.1<small>%</small>", "ic": "flag", "foot": "about 1 in 900"},
+        {"label": "Blend PR-AUC", "value": f"{bl['pr_auc']:.3f}", "ic": "target", "foot": "test window, scored once"},
+        {"label": "Found at 1% FPR", "value": f"{bl['recall_at_1pct_fpr'] * 100:.0f}<small>%</small>", "ic": "check", "foot": "blend of two models"},
+    ]))
+    steps = [("01", "Features", "Each payment plus the recent history of both accounts, using only earlier payments."),
+             ("02", "XGBoost", "Reads the payment and account behaviour: frequency, fan-out, recency."),
+             ("03", "Graph network", "A GNN reads the web of payments around each account, from earlier days only."),
+             ("04", "Blend", "Scores are standardised and mixed; the blend beats either model alone.")]
+    html('<div class="facts">' + "".join(f'<div class="card step"><span class="n">{n}</span><b>{t}</b><span>{d}</span></div>' for n, t, d in steps) + "</div>")
+    html(f'<div class="gap"></div><div class="note">Train Sep 1–6 · validate Sep 7–8 · test {theme.esc(m["test_window"])} ({m["n_test_transactions"]:,} payments). '
+         'Synthetic data; a demonstration of the method, not a product for real banks.</div>')
 
 
 # ------------------------------------------------------------------ run
+state = view_state()
+P = theme.PALETTES[state.get("theme", "dark")]                 # the active palette, for the plotly figures
+st.markdown(f"<style>{theme.css(state.get('theme', 'dark'))}</style>", unsafe_allow_html=True)
 if not logic.bundle_present(DEMO_DIR):
-    st.markdown(theme.title_row("PaperTrail", "The demo data is not installed yet. Unzip <b>demo_bundle.zip</b> (made by notebooks/06-demo-slice.ipynb) into <b>data/demo/</b>."), unsafe_allow_html=True)
+    html(theme.header("PaperTrail", "Demo data not installed. Unzip <b>demo_bundle.zip</b> (from notebooks/06-demo-slice.ipynb) into <b>data/demo/</b>."))
     st.stop()
 bundle = get_bundle(str(DEMO_DIR))
-state = view_state()
-scope = f"Synthetic payments, {bundle.metrics['test_window']}. {bundle.alerts.height} accounts in the queue."
-st.sidebar.markdown(theme.sidebar_html(state, PAGES, logic.MODELS, logic.MODEL_BLURB, scope), unsafe_allow_html=True)
-st.markdown(theme.mobile_nav_html(state, PAGES, logic.MODELS), unsafe_allow_html=True)
+facts = [("Window", bundle.metrics["test_window"][5:].replace(" to 2022-", " → ")), ("Accounts", f"{bundle.alerts.height}"),
+         ("Payments", f"{bundle.metrics['n_test_transactions']:,}"), ("Laundering", f"{bundle.metrics['n_test_positives']:,}")]
+st.sidebar.markdown(theme.sidebar_html(state, PAGES, facts), unsafe_allow_html=True)
+html(theme.mobile_nav_html(state, PAGES))
 {"queue": page_queue, "account": page_account, "try": page_try, "models": page_models, "about": page_about}[state["page"]](bundle, state)

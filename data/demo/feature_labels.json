@@ -1,0 +1,198 @@
+{
+ "log_amt": {
+  "label": "Payment amount (log scale)",
+  "unit": "amount"
+ },
+ "hour": {
+  "label": "Hour of the day",
+  "unit": "hour"
+ },
+ "is_ach": {
+  "label": "Paid by ACH transfer",
+  "unit": "flag"
+ },
+ "is_cross_currency": {
+  "label": "Currency differs between sender and receiver",
+  "unit": "flag"
+ },
+ "is_same_bank": {
+  "label": "Sender and receiver use the same bank",
+  "unit": "flag"
+ },
+ "is_self_transfer": {
+  "label": "Sender and receiver are the same account",
+  "unit": "flag"
+ },
+ "is_round_amount": {
+  "label": "Amount is a round number",
+  "unit": "flag"
+ },
+ "in_amount_band": {
+  "label": "Amount is between 3,000 and 30,000",
+  "unit": "flag"
+ },
+ "cur_code": {
+  "label": "Payment currency (code)",
+  "unit": "code"
+ },
+ "fmt_ACH": {
+  "label": "Payment format is ACH",
+  "unit": "flag"
+ },
+ "fmt_Bitcoin": {
+  "label": "Payment format is Bitcoin",
+  "unit": "flag"
+ },
+ "fmt_Cash": {
+  "label": "Payment format is Cash",
+  "unit": "flag"
+ },
+ "fmt_Cheque": {
+  "label": "Payment format is Cheque",
+  "unit": "flag"
+ },
+ "fmt_Credit_Card": {
+  "label": "Payment format is Credit Card",
+  "unit": "flag"
+ },
+ "fmt_Reinvestment": {
+  "label": "Payment format is Reinvestment",
+  "unit": "flag"
+ },
+ "fmt_Wire": {
+  "label": "Payment format is Wire",
+  "unit": "flag"
+ },
+ "s_out_cnt_24h": {
+  "label": "Sender: payments sent in the last 24 hours",
+  "unit": "count"
+ },
+ "s_out_cnt_7d": {
+  "label": "Sender: payments sent in the last 7 days",
+  "unit": "count"
+ },
+ "s_in_cnt_24h": {
+  "label": "Sender: payments received in the last 24 hours",
+  "unit": "count"
+ },
+ "s_in_cnt_7d": {
+  "label": "Sender: payments received in the last 7 days",
+  "unit": "count"
+ },
+ "s_out_sum_24h": {
+  "label": "Sender: total amount sent in the last 24 hours",
+  "unit": "amount"
+ },
+ "s_out_sum_7d": {
+  "label": "Sender: total amount sent in the last 7 days",
+  "unit": "amount"
+ },
+ "s_in_sum_24h": {
+  "label": "Sender: total amount received in the last 24 hours",
+  "unit": "amount"
+ },
+ "s_in_sum_7d": {
+  "label": "Sender: total amount received in the last 7 days",
+  "unit": "amount"
+ },
+ "s_out_mean_7d": {
+  "label": "Sender: average payment sent over the last 7 days",
+  "unit": "amount"
+ },
+ "s_in_mean_7d": {
+  "label": "Sender: average payment received over the last 7 days",
+  "unit": "amount"
+ },
+ "s_uniq_out": {
+  "label": "Sender: different accounts paid so far",
+  "unit": "count"
+ },
+ "s_uniq_in": {
+  "label": "Sender: different accounts received from so far",
+  "unit": "count"
+ },
+ "s_tot_out": {
+  "label": "Sender: payments sent so far in the data",
+  "unit": "count"
+ },
+ "s_tot_in": {
+  "label": "Sender: payments received so far in the data",
+  "unit": "count"
+ },
+ "s_gap_s": {
+  "label": "Sender: time since the account's previous activity",
+  "unit": "seconds"
+ },
+ "d_out_cnt_24h": {
+  "label": "Receiver: payments sent in the last 24 hours",
+  "unit": "count"
+ },
+ "d_out_cnt_7d": {
+  "label": "Receiver: payments sent in the last 7 days",
+  "unit": "count"
+ },
+ "d_in_cnt_24h": {
+  "label": "Receiver: payments received in the last 24 hours",
+  "unit": "count"
+ },
+ "d_in_cnt_7d": {
+  "label": "Receiver: payments received in the last 7 days",
+  "unit": "count"
+ },
+ "d_out_sum_24h": {
+  "label": "Receiver: total amount sent in the last 24 hours",
+  "unit": "amount"
+ },
+ "d_out_sum_7d": {
+  "label": "Receiver: total amount sent in the last 7 days",
+  "unit": "amount"
+ },
+ "d_in_sum_24h": {
+  "label": "Receiver: total amount received in the last 24 hours",
+  "unit": "amount"
+ },
+ "d_in_sum_7d": {
+  "label": "Receiver: total amount received in the last 7 days",
+  "unit": "amount"
+ },
+ "d_out_mean_7d": {
+  "label": "Receiver: average payment sent over the last 7 days",
+  "unit": "amount"
+ },
+ "d_in_mean_7d": {
+  "label": "Receiver: average payment received over the last 7 days",
+  "unit": "amount"
+ },
+ "d_uniq_out": {
+  "label": "Receiver: different accounts paid so far",
+  "unit": "count"
+ },
+ "d_uniq_in": {
+  "label": "Receiver: different accounts received from so far",
+  "unit": "count"
+ },
+ "d_tot_out": {
+  "label": "Receiver: payments sent so far in the data",
+  "unit": "count"
+ },
+ "d_tot_in": {
+  "label": "Receiver: payments received so far in the data",
+  "unit": "count"
+ },
+ "d_gap_s": {
+  "label": "Receiver: time since the account's previous activity",
+  "unit": "seconds"
+ },
+ "has_reverse_before": {
+  "label": "The receiver has already paid the sender before",
+  "unit": "flag"
+ },
+ "s_pagerank": {
+  "label": "Sender: importance in the payment network (PageRank, 1 = average)",
+  "unit": "score"
+ },
+ "d_pagerank": {
+  "label": "Receiver: importance in the payment network (PageRank, 1 = average)",
+  "unit": "score"
+ }
+}
