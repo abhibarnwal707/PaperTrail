@@ -9,7 +9,7 @@ import polars as pl
 from app.theme import model_color
 
 TRANSPARENT = "rgba(0,0,0,0)"
-SANS = "Geist, Inter, system-ui, sans-serif"
+SANS = "Pilcrow Rounded, Geist, Inter, system-ui, sans-serif"
 MONO = "Geist Mono, ui-monospace, Menlo, monospace"
 NAMES = {"blend": "Blend", "xgb": "XGBoost", "gnn": "GNN", "xgb_tabular": "XGBoost, payment only", "rules_v1": "Rules"}
 

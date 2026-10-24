@@ -99,7 +99,8 @@ def page_queue(b: logic.Bundle, S: dict) -> None:
     f = logic.queue_findings(b, model)
     tiers = logic.tier_counts(b, model)
     html(theme.header("Alert queue", f"{f['accounts']} accounts · {b.metrics['test_window'].replace(' to ', ' – ')}",
-                      tools(S, theme.seg(S, SEG), theme.button("Open top alert", theme.href(S, page="account", account=f["top"], reveal=None, p=None), ic="next"))))
+                      tools(S, theme.seg(S, SEG), theme.button("Open top alert", theme.href(S, page="account", account=f["top"], reveal=None, p=None), ic="next")),
+                      art="paper-trail", tone="f2"))
     flagged = f["flagged"][model]
     html(theme.kpi_cards([
         {"label": "Accounts in queue", "value": f"{f['accounts']}", "ic": "users", "foot": theme.pill(f"{tiers['Critical']} critical", "coral")},
@@ -167,7 +168,7 @@ def page_account(b: logic.Bundle, S: dict) -> None:
     tier = logic.risk_tier(b, model, row[f"{model}_risk"])
     reveal = S.get("reveal") == "1"
     right = tools(S, theme.seg(S, SEG), theme.button("Next", theme.href(S, account=nxt, reveal=None), ic="next") if nxt else "")
-    html(theme.header(account, "", right, crumb=crumb(S, "Investigate"), mono=True, badge=theme.tier_pill(tier, big=True)))
+    html(theme.header(account, "", right, crumb=crumb(S, "Investigate"), mono=True, badge=theme.tier_pill(tier, big=True), art="hero-network", tone="f3"))
 
     cards = []
     for m in ("blend", "xgb", "gnn"):
@@ -336,7 +337,7 @@ def chat_pane(b: logic.Bundle, account: str, ok: bool, why: str) -> None:
 
 
 def page_try(b: logic.Bundle, S: dict) -> None:
-    html(theme.header("Simulator", "Describe a payment, see if XGBoost would alert", tools(S)))
+    html(theme.header("Simulator", "Describe a payment, see if XGBoost would alert", tools(S), art="dial", tone="f4"))
     if not b.boosters:
         html('<div class="empty">The XGBoost models could not be loaded here, so scoring is unavailable.</div>')
         return
@@ -377,7 +378,7 @@ def page_try(b: logic.Bundle, S: dict) -> None:
 def page_models(b: logic.Bundle, S: dict) -> None:
     m = b.metrics
     bl = m["models"]["blend"]
-    html(theme.header("Model performance", f"{m['n_test_transactions']:,} unseen payments · {m['n_test_positives']:,} laundering · 3-seed means", tools(S, theme.button("Drift report", DRIFT_URL, "ghost", ic="trail", external=True))))
+    html(theme.header("Model performance", f"{m['n_test_transactions']:,} unseen payments · {m['n_test_positives']:,} laundering · 3-seed means", tools(S, theme.button("Drift report", DRIFT_URL, "ghost", ic="trail", external=True)), art="curves", tone="f5"))
 
     def delta(k: str, pct: bool = False) -> str:
         d = bl[k] - max(m["models"]["xgb"][k], m["models"]["gnn"][k])
@@ -451,8 +452,8 @@ def home_cta(b: logic.Bundle, S: dict) -> None:
 def page_about(b: logic.Bundle, S: dict) -> None:
     m = b.metrics
     bl = m["models"]["blend"]
-    html(f'<div class="card hero"><div style="display:flex;justify-content:space-between;align-items:center">{theme.pill("Portfolio project · synthetic data", "lime")}{tools(S)}</div><h1>Find the laundering. Show why.</h1>'
-         '<p>PaperTrail ranks accounts by how suspicious their payments look, explains each score, and puts the riskiest cases first.</p></div><div class="gap"></div>')
+    html(theme.header("Find the laundering. Show why.", "PaperTrail ranks accounts by how suspicious their payments look, explains each score, and puts "
+                      "the riskiest cases first.", theme.pill("Portfolio project · synthetic data", "grey") + tools(S), art="pattern-cycle", tone="f1"))
     html(theme.kpi_cards([
         {"label": "Payments", "value": "5.08<small>M</small>", "ic": "db", "foot": "IBM AML · HI-Small"},
         {"label": "Laundering rate", "value": "0.1<small>%</small>", "ic": "flag", "foot": "about 1 in 900"},

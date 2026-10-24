@@ -166,13 +166,60 @@ def ribbon(path: Path, size=(2400, 900)):
     c.finish(path, size, grain=5)
 
 
+def dial(path: Path, size=(1600, 1600)):
+    """The simulator's score dial: rings of ticks, a coral alert zone and the needle past the line."""
+    w, h = size
+    c = Canvas(w, h)
+    cx, cy = w / 2, h / 2
+    for r, col in ((620, (30, 33, 44)), (500, (30, 33, 44)), (380, (30, 33, 44))):
+        c.arc((cx, cy), r, col, 1.6)
+    for i in range(61):                                         # ticks from 0 to 1 across 270 degrees
+        a = np.radians(135 + i * 270 / 60)
+        hot = i >= 44
+        r0, r1 = (560, 610) if i % 5 == 0 else (580, 605)
+        col = CORAL if hot else ((147, 241, 247) if i % 5 == 0 else (70, 78, 100))
+        c.line((cx + r0 * np.cos(a), cy + r0 * np.sin(a)), (cx + r1 * np.cos(a), cy + r1 * np.sin(a)), col, 5 if i % 5 == 0 else 3, glow=hot)
+    c.arc((cx, cy), 470, CORAL, 9, start=135 + 270 * 44 / 60, end=405)
+    c.arc((cx, cy), 470, CYAN, 9, start=135, end=135 + 270 * 30 / 60)
+    a = np.radians(135 + 270 * 0.82)
+    c.line((cx, cy), (cx + 430 * np.cos(a), cy + 430 * np.sin(a)), CORAL, 8)
+    c.dot((cx, cy), 40, CORAL, ring=True)
+    c.dot((cx, cy), 18, CORAL)
+    c.finish(path, size)
+
+
+def curves(path: Path, size=(1600, 1600)):
+    """Precision falling as recall rises: three models' curves, the blend on top."""
+    w, h = size
+    c = Canvas(w, h)
+    x0, y0, x1, y1 = 220, 1380, 1400, 220
+    for i in range(5):
+        y = y0 - i * (y0 - y1) / 4
+        c.line((x0, y), (x1, y), (26, 28, 38), 1.4, glow=False)
+        x = x0 + i * (x1 - x0) / 4
+        c.line((x, y0), (x, y1), (26, 28, 38), 1.4, glow=False)
+    for k, col in ((0.55, ORANGE), (0.75, BLUE), (1.0, CYAN)):
+        pts = []
+        for t in np.linspace(0, 1, 90):
+            prec = (1 - t ** (1.6 + 2.4 * k)) * (0.35 + 0.65 * k) + 0.02
+            pts.append((x0 + t * (x1 - x0), y0 - prec * (y0 - y1)))
+        for a, b in pairwise(pts):
+            c.line(a, b, col, 6 if k == 1.0 else 4)
+    c.dot((x0 + 0.72 * (x1 - x0), y0 - 0.47 * (y0 - y1)), 22, CORAL)
+    c.dot((x0 + 0.72 * (x1 - x0), y0 - 0.47 * (y0 - y1)), 44, CORAL, ring=True)
+    c.finish(path, size)
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     hero(OUT / "hero-network.jpg")
     cycle(OUT / "pattern-cycle.jpg")
     fan(OUT / "pattern-scatter-gather.jpg")
     ribbon(OUT / "paper-trail.jpg")
-    for name, w in (("hero-network", 1800), ("pattern-cycle", 1000), ("pattern-scatter-gather", 1000), ("paper-trail", 1800)):
+    dial(OUT / "dial.jpg")
+    curves(OUT / "curves.jpg")
+    for name, w in (("hero-network", 1800), ("pattern-cycle", 1000), ("pattern-scatter-gather", 1000), ("paper-trail", 1800),
+                    ("dial", 1000), ("curves", 1000)):
         f = OUT / f"{name}.jpg"                              # downscale: the images ride inline in the page, so keep them light
         im = Image.open(f)
         im.resize((w, round(im.height * w / im.width)), Image.LANCZOS).save(f, quality=80, optimize=True, progressive=True)
