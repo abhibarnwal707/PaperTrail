@@ -14,12 +14,12 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))       # the investigator agent lives in src/papertrail/agent
-from app import logic, theme, viz
+from app import landing, logic, theme, viz
 
 st.set_page_config(page_title="PaperTrail", layout="wide", initial_sidebar_state="auto")
 
 DEMO_DIR = Path(os.environ.get("PAPERTRAIL_DEMO_DIR", Path(__file__).resolve().parents[1] / "data" / "demo"))
-PAGES = {"queue": "Alerts", "account": "Investigate", "try": "Simulator", "models": "Models", "about": "About"}
+PAGES = {"home": "Home", "queue": "Alerts", "account": "Investigate", "try": "Simulator", "models": "Models", "about": "About"}
 SEG = {"blend": "Blend", "xgb": "XGBoost", "gnn": "GNN"}
 PLOT = {"displayModeBar": False}
 PER_PAGE = 25
@@ -59,9 +59,9 @@ def agent_ready() -> tuple[bool, str]:
 
 def view_state() -> dict:
     q = st.query_params
-    page = q.get("page", "queue")
+    page = q.get("page", "home")
     model = q.get("model", "blend")
-    s = {"page": page if page in PAGES else "queue", "model": model if model in logic.MODELS else "blend"}
+    s = {"page": page if page in PAGES else "home", "model": model if model in logic.MODELS else "blend"}
     if q.get("theme") in theme.THEMES and q.get("theme") != "dark":
         s["theme"] = q.get("theme")
     for k in ("account", "reveal", "p"):
@@ -409,6 +409,12 @@ def page_models(b: logic.Bundle, S: dict) -> None:
             html(theme.legend(parts))
 
 
+def page_home(b: logic.Bundle, S: dict) -> None:
+    top = {m: b.alerts.sort(f"{m}_rank")["account"][0] for m in ("blend", "xgb", "gnn")}
+    html(f"<style>{landing.HOME_CSS}</style>")
+    st.iframe(landing.build(b.metrics, top), height="content")
+
+
 def page_about(b: logic.Bundle, S: dict) -> None:
     m = b.metrics
     bl = m["models"]["blend"]
@@ -442,4 +448,4 @@ facts = [("Window", bundle.metrics["test_window"][5:].replace(" to 2022-", " →
          ("Payments", f"{bundle.metrics['n_test_transactions']:,}"), ("Laundering", f"{bundle.metrics['n_test_positives']:,}")]
 st.sidebar.markdown(theme.sidebar_html(state, PAGES, facts), unsafe_allow_html=True)
 html(theme.mobile_nav_html(state, PAGES))
-{"queue": page_queue, "account": page_account, "try": page_try, "models": page_models, "about": page_about}[state["page"]](bundle, state)
+{"home": page_home, "queue": page_queue, "account": page_account, "try": page_try, "models": page_models, "about": page_about}[state["page"]](bundle, state)

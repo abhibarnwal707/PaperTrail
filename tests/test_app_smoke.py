@@ -6,7 +6,7 @@ import pytest
 
 DEMO = Path(__file__).resolve().parents[1] / "data" / "demo"
 APP = Path(__file__).resolve().parents[1] / "app" / "streamlit_app.py"
-PAGES = ("queue", "account", "try", "models", "about")
+PAGES = ("home", "queue", "account", "try", "models", "about")
 pytestmark = pytest.mark.skipif(not (DEMO / "alerts.parquet").exists(), reason="demo bundle not installed in data/demo/")
 
 

@@ -18,9 +18,9 @@ from urllib.parse import urlencode
 
 PALETTES = {
     # Night Arcade: purple-tinted black, bright pastel-neons (light, vivid accents keep contrast on dark surfaces)
-    "dark": {"name": "Night Arcade", "bg": "#0d0c13", "side": "#100f17", "panel": "#15141d", "panel2": "#1d1c27", "text": "#f2f0fa", "text2": "#cfcbdc",
-             "muted": "#9a97a8", "faint": "#6a677a", "lime": "#d7ff3a", "sky": "#4fe3ff", "violet": "#b794ff", "coral": "#ff5c8a",
-             "amber": "#ffc24b", "mint": "#5cf2b2", "onbrand": "#0d0c13", "watch": "#3b3948", "neutral": "#e9e6f5", "grid": "rgba(255,255,255,0.06)"},
+    "dark": {"name": "Candy on Black", "bg": "#000000", "side": "#050507", "panel": "#0d0d11", "panel2": "#17171d", "text": "#f2f0fa", "text2": "#cfcbdc",
+             "muted": "#9a97a8", "faint": "#6a677a", "lime": "#93f1f7", "sky": "#b9c8ff", "violet": "#fbb65c", "coral": "#ff5c8a",
+             "amber": "#f3ea7a", "mint": "#9ae187", "onbrand": "#000000", "watch": "#3b3948", "neutral": "#e9e6f5", "grid": "rgba(255,255,255,0.06)"},
     # Riso Paper: warm cream stock and deep risograph inks (darker, saturated accents so nothing washes out on a light page)
     "light": {"name": "Riso Paper", "bg": "#f4efe6", "side": "#efe9dd", "panel": "#fffcf6", "panel2": "#f6f0e5", "text": "#1f1c17", "text2": "#3d3930",
               "muted": "#6d675d", "faint": "#8f887b", "lime": "#2f43d0", "sky": "#0b8a84", "violet": "#8a3ffc", "coral": "#c20e6e",
@@ -29,7 +29,7 @@ PALETTES = {
 THEMES = tuple(PALETTES)
 MODEL_KEY = {"blend": "lime", "xgb": "sky", "gnn": "violet"}
 MODEL_VAR = {m: f"var(--{k})" for m, k in MODEL_KEY.items()}
-FONT_LINKS = "@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');"
+FONT_LINKS = "@import url('https://api.fontshare.com/v2/css?f[]=pilcrow-rounded@400,500,700&display=swap');@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');"
 
 
 def model_color(p: dict, model: str) -> str:
@@ -41,7 +41,7 @@ def css(theme_name: str = "dark") -> str:
     p = PALETTES.get(theme_name, PALETTES["dark"])
     tokens = "".join(f"--{k}: {v}; " for k, v in p.items() if k not in ("name", "grid"))
     root = (f":root {{ {tokens}--line: color-mix(in srgb, var(--text) 8%, transparent); --line2: color-mix(in srgb, var(--text) 14%, transparent); "
-            "--font: 'Geist', Inter, system-ui, sans-serif; --mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; --r: 16px; "
+            "--font: 'Pilcrow Rounded', 'Geist', Inter, system-ui, sans-serif; --mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace; --r: 22px; "
             f"color-scheme: {'light' if theme_name == 'light' else 'dark'}; }}")
     return FONT_LINKS + root + _RULES
 
@@ -295,6 +295,7 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 """
 
 _ICONS = {
+    "home": '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>',
     "queue": '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     "account": '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     "try": '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
