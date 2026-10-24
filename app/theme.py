@@ -2,8 +2,8 @@
 
 Style: a "control room" dashboard. Rounded cards with a hairline border and a faint top sheen, big figures with small
 chips under them, icon navigation, a segmented model switch, and short copy (the details live in hover tooltips).
-Two palettes, switched by ?theme= in the URL: "Night Arcade" (dark: purple-tinted black, bright pastel-neon accents) and
-"Riso Paper" (light: cream stock, deep risograph inks; light pages need darker, more saturated accents than dark ones).
+Two palettes, switched by ?theme= in the URL: "Candy on Black" (dark: true black, bright pastel candies) and
+"Candy on Paper" (light: white stock, deeper candies; light pages need darker, more saturated accents than dark ones).
 The token names are the colours' jobs in the dark palette, and every palette keeps the jobs:
 - lime is the brand and the selection (and the blend's series);
 - sky is XGBoost, violet is the GNN;
@@ -17,14 +17,15 @@ import html
 from urllib.parse import urlencode
 
 PALETTES = {
-    # Night Arcade: purple-tinted black, bright pastel-neons (light, vivid accents keep contrast on dark surfaces)
+    # Candy on Black: true black, bright pastel candies (light, vivid accents keep contrast on dark surfaces)
     "dark": {"name": "Candy on Black", "bg": "#000000", "side": "#050507", "panel": "#0d0d11", "panel2": "#17171d", "text": "#f2f0fa", "text2": "#cfcbdc",
              "muted": "#9a97a8", "faint": "#6a677a", "lime": "#93f1f7", "sky": "#b9c8ff", "violet": "#fbb65c", "coral": "#ff5c8a",
              "amber": "#f3ea7a", "mint": "#9ae187", "onbrand": "#000000", "watch": "#3b3948", "neutral": "#e9e6f5", "grid": "rgba(255,255,255,0.06)"},
-    # Riso Paper: warm cream stock and deep risograph inks (darker, saturated accents so nothing washes out on a light page)
-    "light": {"name": "Riso Paper", "bg": "#f4efe6", "side": "#efe9dd", "panel": "#fffcf6", "panel2": "#f6f0e5", "text": "#1f1c17", "text2": "#3d3930",
-              "muted": "#6d675d", "faint": "#8f887b", "lime": "#2f43d0", "sky": "#0b8a84", "violet": "#8a3ffc", "coral": "#c20e6e",
-              "amber": "#b86a00", "mint": "#18885a", "onbrand": "#ffffff", "watch": "#d9d1c3", "neutral": "#3d3930", "grid": "rgba(31,28,23,0.08)"},
+    # Candy on Paper: white stock, near-black ink, and deeper versions of the dark palette's candies (light pages need darker,
+    # more saturated accents than dark ones, or the series wash out)
+    "light": {"name": "Candy on Paper", "bg": "#f7f7f4", "side": "#efefea", "panel": "#ffffff", "panel2": "#f3f3ef", "text": "#0b0b0f", "text2": "#2c2c33",
+              "muted": "#5c5c66", "faint": "#8a8a94", "lime": "#0a8c96", "sky": "#3d55d9", "violet": "#d26a00", "coral": "#d6205c",
+              "amber": "#a87c00", "mint": "#2b8a3e", "onbrand": "#ffffff", "watch": "#dcdce3", "neutral": "#2c2c33", "grid": "rgba(11,11,15,0.07)"},
 }
 THEMES = tuple(PALETTES)
 MODEL_KEY = {"blend": "lime", "xgb": "sky", "gnn": "violet"}
@@ -344,11 +345,19 @@ def sidebar_html(state: dict, pages: dict, facts: list[tuple[str, str]]) -> str:
     rows = "".join(f'<div class="row"><span>{esc(k)}</span><b>{esc(v)}</b></div>' for k, v in facts)
     return (f'<div class="brand"><span class="logo">{icon("trail")}</span><b>PaperTrail</b></div>'
             f'<div class="nav">{nav}</div>'
+            f'<div class="nav theme-sw">{theme_link(state)}</div>'
             f'<div class="side-card"><div class="t"><span class="live"></span>Test window</div>{rows}</div>')
+
+
+def theme_link(state: dict) -> str:
+    """The sidebar's light/dark switch, labelled with where the click goes."""
+    light = state.get("theme") == "light"
+    return link(href(state, theme=None if light else "light"), icon("moon" if light else "sun") + ("Dark theme" if light else "Light theme"))
 
 
 def mobile_nav_html(state: dict, pages: dict) -> str:
     nav = "".join(link(href(state, page=k, reveal=None, p=None), esc(v), "on" if state["page"] == k else "") for k, v in pages.items())
+    nav += link(href(state, theme=None if state.get("theme") == "light" else "light"), "Dark" if state.get("theme") == "light" else "Light")
     return f'<div class="mobile-nav"><div class="row">{nav}</div></div>'
 
 

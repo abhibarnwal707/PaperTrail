@@ -52,7 +52,7 @@ class Canvas:
         img = img.resize(size, Image.LANCZOS)
         rng = np.random.default_rng(seed)
         arr = np.asarray(img).astype(np.float32) + rng.normal(0, grain, (size[1], size[0], 1))
-        Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8)).save(path, quality=88, optimize=True, progressive=True)
+        Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8)).save(path, quality=80, optimize=True, progressive=True)
         print("wrote", path.name, path.stat().st_size // 1024, "KB")
 
 
@@ -172,3 +172,8 @@ if __name__ == "__main__":
     cycle(OUT / "pattern-cycle.jpg")
     fan(OUT / "pattern-scatter-gather.jpg")
     ribbon(OUT / "paper-trail.jpg")
+    for name, w in (("hero-network", 1800), ("pattern-cycle", 1000), ("pattern-scatter-gather", 1000), ("paper-trail", 1800)):
+        f = OUT / f"{name}.jpg"                              # downscale: the images ride inline in the page, so keep them light
+        im = Image.open(f)
+        im.resize((w, round(im.height * w / im.width)), Image.LANCZOS).save(f, quality=80, optimize=True, progressive=True)
+        print("resized", f.name, f.stat().st_size // 1024, "KB")

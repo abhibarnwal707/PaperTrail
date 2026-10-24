@@ -410,9 +410,36 @@ def page_models(b: logic.Bundle, S: dict) -> None:
 
 
 def page_home(b: logic.Bundle, S: dict) -> None:
-    top = {m: b.alerts.sort(f"{m}_rank")["account"][0] for m in ("blend", "xgb", "gnn")}
+    """The landing page (app/landing/home.html, rendered into the app, not an iframe) with a native "open a case" form."""
+    order = b.alerts.sort("blend_rank")["account"].to_list()
+    go = lambda **c: theme.href(S, **{"reveal": None, "p": None, "account": None, **c})
+    hrefs = {"home": go(page="home"), "queue": go(page="queue"), "top": go(page="account", account=order[0]), "try": go(page="try"),
+             "models": go(page="models"), "about": go(page="about"), "theme": theme.href(S, theme=None if S.get("theme") == "light" else "light")}
+    light = S.get("theme") == "light"
+    switch = (theme.icon("moon" if light else "sun") + ("dark" if light else "light"), f'Switch to the {"dark" if light else "light"} theme')
+    top, foot = landing.build(b.metrics, hrefs, S.get("theme", "dark"), switch)
     html(f"<style>{landing.HOME_CSS}</style>")
-    st.iframe(landing.build(b.metrics, top), height="content")
+    st.html(top, unsafe_allow_javascript=True)
+    home_cta(b, S)
+    st.html(foot)
+
+
+def home_cta(b: logic.Bundle, S: dict) -> None:
+    """Pick a model and an account (ordered by that model's rank) and open its case: real widgets, so it works without JS."""
+    with st.container(key="lp-cta"):
+        left, right = st.columns([6, 5], gap="large", vertical_alignment="center")
+        with left:
+            st.html('<h2 class="lp-cta-h">open a case.</h2><p class="lp-cta-p">Pick a model, choose an account from its ranking (the riskiest '
+                    "first) and read the investigator's case file: network, score drivers, payments and the agent's verified summary.</p>")
+        with right, st.container(key="lp-dlg"):
+            st.html(f'<h3 class="lp-dlg-h">Open an account</h3><p class="lp-dlg-p">{b.alerts.height} accounts from the test window, riskiest first.</p>')
+            model = st.segmented_control("Ranked by", list(SEG), format_func=SEG.get, default=S["model"], key="lp-model") or "blend"
+            ranked = b.alerts.sort(f"{model}_rank").select("account", f"{model}_rank").rows()
+            rank = dict(ranked)
+            account = st.selectbox("Account", [a for a, _ in ranked], format_func=lambda a: f"#{rank[a]} · {a}", key=f"lp-acct-{model}")
+            if st.button("Open case →", type="primary", width="stretch", key="lp-open"):
+                st.query_params.from_dict({k: v for k, v in {"page": "account", "account": account, "model": model, "theme": S.get("theme")}.items() if v})
+                st.rerun()
 
 
 def page_about(b: logic.Bundle, S: dict) -> None:

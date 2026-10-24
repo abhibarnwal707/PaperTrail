@@ -31,6 +31,7 @@ Banks must report laundering, but it is about **1 payment in 980**. A model that
 
 **[papertrail-aml.streamlit.app](https://papertrail-aml.streamlit.app)** (free hosting; the first visit after a quiet spell takes about 30 s to wake up).
 
+- **Home**: what PaperTrail does and its headline results, a live model switch, and an "open a case" picker that jumps straight into any account. A light/dark switch sits in the sidebar on every page.
 - **Alerts**: 200 accounts from the test window, ranked by the selected model (Blend / XGBoost / GNN), with risk tiers, top signals and which models agree. A "ground truth" switch reveals the real answers.
 - **Investigate**: the payment network (flagged payments in red), the score drivers, a timeline of payments, and the **investigator agent**: a cached case summary, live regeneration with a model picker, and a chat ("Who pays it?", "Any money loops?") whose answers cite their sources.
 - **Simulator**: describe a payment and a sender profile and see whether XGBoost would raise an alert, with the reasons.
