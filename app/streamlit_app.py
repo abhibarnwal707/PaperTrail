@@ -5,6 +5,7 @@ State lives in the URL (?page=...&model=...&account=...), so every view can be l
 """
 from __future__ import annotations
 
+import importlib
 import os
 import sys
 from pathlib import Path
@@ -15,6 +16,11 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))       # the investigator agent lives in src/papertrail/agent
 from app import landing, logic, theme, viz
+
+# Streamlit Cloud reruns this script after a git push but keeps already-imported modules, so app/*.py could stay at the
+# previous commit (a TypeError on a changed signature). Reloading the four small, pure modules each run costs ~ms.
+for _mod in (theme, logic, viz, landing):
+    importlib.reload(_mod)
 
 st.set_page_config(page_title="PaperTrail", layout="wide", initial_sidebar_state="auto")
 
