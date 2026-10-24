@@ -6,7 +6,7 @@ PaperTrail ranks bank accounts and payments by how suspicious they look, using g
 
 **[Live demo](https://papertrail-aml.streamlit.app)** · **[Drift report](https://abhibarnwal707.github.io/PaperTrail/)** · **[Experiments on DagsHub](https://dagshub.com/abhibarnwal707/papertrail)**
 
-![PaperTrail console: alert queue, investigation, investigator agent, simulator, models](docs/assets/demo.gif)
+![PaperTrail console: home, alert queue, investigation with the investigator agent, simulator, models, light theme](docs/assets/demo.gif)
 
 | | Test result (Sep 9–10, 862,792 unseen payments, 956 laundering) |
 |---|---|
