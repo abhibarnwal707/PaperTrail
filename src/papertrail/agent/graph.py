@@ -16,9 +16,10 @@ from langgraph.graph import END, StateGraph
 from pydantic import ValidationError
 
 from papertrail.agent.llm import ChatClient, LLMError
-from papertrail.agent.prompts import draft_messages
+from papertrail.agent.prompts import PROMPT_VERSION, draft_messages
 from papertrail.agent.schemas import CaseSummary
 from papertrail.agent.tools import Toolbox
+from papertrail.agent.tracing import NullTracer, TracedClient, TracedToolbox, Tracer
 from papertrail.agent.verify import check, verified_evidence
 
 MAX_CALLS, MAX_DRAFTS = 6, 2
@@ -37,7 +38,21 @@ class State(TypedDict, total=False):
     result: dict
 
 
-def build(toolbox: Toolbox, client: ChatClient):
+def build(toolbox: Toolbox, client: ChatClient, tracer: Tracer | NullTracer | None = None):
+    tracer = tracer or NullTracer()
+
+    def traced(name, fn):
+        """Record each graph step: its duration and, for `verify`, the guardrail's rejections."""
+        def run(s: State) -> State:
+            t0 = time.perf_counter()
+            out = fn(s)
+            tracer.event("step", node=name, duration_s=round(time.perf_counter() - t0, 4), drafts=out.get("drafts", s.get("drafts")),
+                         errors=out.get("errors", s.get("errors")))
+            if name == "verify" and out.get("errors"):
+                tracer.event("guardrail_rejection", draft=s.get("drafts"), errors=out["errors"])
+            return out
+        return run
+
     def gather(s: State) -> State:
         out = toolbox.gather(s["account"])
         return {"outputs": out, "calls": s.get("calls", 0) + len(out), "drafts": 0, "errors": [], "llm": [], "history": []}
@@ -91,7 +106,7 @@ def build(toolbox: Toolbox, client: ChatClient):
 
     g = StateGraph(State)
     for name, fn in (("gather", gather), ("draft", draft), ("verify", verify), ("done", done), ("fallback", fallback)):
-        g.add_node(name, fn)
+        g.add_node(name, traced(name, fn))
     g.set_entry_point("gather")
     g.add_edge("gather", "draft")
     g.add_edge("draft", "verify")
@@ -112,10 +127,19 @@ def _result(s: State, summary: CaseSummary, verified: bool) -> dict[str, Any]:
             "generated_at": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime())}
 
 
-def investigate(account: str, toolbox: Toolbox, client: ChatClient | None = None) -> dict:
-    """Run the whole case and return the result dict (summary, verified flag, provider, model, tokens, timings)."""
+def investigate(account: str, toolbox: Toolbox, client: ChatClient | None = None, tracer: Tracer | NullTracer | None = None) -> dict:
+    """Run the whole case and return the result dict (summary, verified flag, provider, model, tokens, timings).
+    Tracing is off unless `tracer` is given or PAPERTRAIL_TRACING=jsonl (see tracing.py)."""
     t0 = time.time()
-    out = build(toolbox, client or ChatClient()).invoke({"account": account}, {"recursion_limit": 20})["result"]
+    tracer = tracer if tracer is not None else Tracer.from_env()
+    client = client or ChatClient()
+    if tracer.enabled:
+        toolbox, client = TracedToolbox(toolbox, tracer), TracedClient(client, tracer)
+        tracer.event("run_start", account=account, prompt_version=PROMPT_VERSION)
+    out = build(toolbox, client, tracer).invoke({"account": account}, {"recursion_limit": 20})["result"]
     out["total_latency_s"] = round(time.time() - t0, 2)
     assert out["calls"] <= MAX_CALLS
+    if tracer.enabled:
+        out["trace_run_id"] = tracer.run_id
+        tracer.event("run_end", result=out)
     return out

@@ -101,16 +101,6 @@ class FakeClient:
         return r, {"provider": "fake", "model": "m", "latency_s": 0.1, "prompt_tokens": 100, "completion_tokens": 50}
 
 
-@pytest.fixture
-def toolbox():
-    pytest.importorskip("langgraph")
-    from papertrail.agent.tools import Toolbox
-
-    if not (DEMO / "alerts.parquet").exists():
-        pytest.skip("demo bundle not installed")
-    return Toolbox(DEMO)
-
-
 def _good(tb, account):
     a = tb.get_alert(account)
     return {"account_id": account, "risk_score": a["models"]["blend"]["risk_score"], "suspected_typology": "UNCLEAR",

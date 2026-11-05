@@ -73,3 +73,9 @@ metrics is NOT measured: it would need a Kaggle rerun (TODO, do not claim either
   drift. The no-drift control therefore shuffles payments in time and spaces timestamps evenly. The control still has 2 of the 3 features needed to fire.
 - Finding: corrupting the evaluation labels as well as the training labels fooled the gate (both models scored ~0.12). Documented as a gate limit;
   the "broken retrain" scenario corrupts training labels only.
+
+### Section 3 (tracing and replay): done
+- `agent/tracing.py` (Tracer, TracedToolbox, TracedClient, ReplayToolbox/Client, `replay`), hooks in `agent/graph.py` (`investigate(..., tracer=)`, per-node step events,
+  guardrail rejections), `PROMPT_VERSION` in `agent/prompts.py`, `scripts/replay.py`, `tests/test_tracing.py`, `tests/conftest.py` (shared `toolbox` fixture), `docs/AGENT_OBSERVABILITY.md`.
+- Decision: JSONL sink only; Langfuse/OTel exporter not built (could not test without keys). Plan item "Langfuse or OpenTelemetry" is therefore only partly met.
+- Section 4 status: guardrail unit tests already exist in `tests/test_agent.py`; 30-case eval exists in `reports/agent_eval.md`. Still missing: a no-LLM baseline comparison and cost estimates.

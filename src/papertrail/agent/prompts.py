@@ -2,6 +2,7 @@
 prompt passes the guardrail on its first draft."""
 from __future__ import annotations
 
+import hashlib
 import json
 
 from papertrail.agent.schemas import ACTIONS, TYPOLOGIES
@@ -43,6 +44,9 @@ Hard rules (a checker rejects the summary otherwise):
    - close_false_positive when only one model flags it, the network looks ordinary, and the score rests on a single factor;
    - otherwise enhanced_review.
 The data is synthetic (IBM AML dataset). Never mention model internals beyond what the outputs say."""
+
+
+PROMPT_VERSION = hashlib.sha1(SYSTEM.encode()).hexdigest()[:8]     # changes whenever the instructions change; recorded on every traced LLM call
 
 
 def draft_messages(account: str, outputs: dict[str, dict], errors: list[str] | None = None, previous: dict | None = None) -> list[dict]:
