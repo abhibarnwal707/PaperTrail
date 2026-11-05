@@ -54,7 +54,7 @@ def test_materialise_round_trips_the_model_dir(reg, tmp_path):
 
 
 def test_end_to_end_promote_script_on_demo_slice(tmp_path):
-    from scripts import promote
+    from papertrail.lifecycle import promotion as promote
     cfg = LifecycleConfig(tracking_uri=f"sqlite:///{tmp_path / 'mlflow.db'}", model_name="t2", experiment="t2")
     first = promote.run(0, cfg=cfg)
     assert first["promoted"] and first["current_metrics"] is None

@@ -65,3 +65,11 @@ Each daily PageRank snapshot was sized by ALL accounts in the frame, including a
 depended weakly on the future account count. Edges used were always earlier ones. Fix is opt-in (`as_of_nodes=True`) so the published results
 (trained with the legacy behaviour) stay reproducible; the lifecycle pipeline uses the strict version. Whether the legacy leak changes the headline
 metrics is NOT measured: it would need a Kaggle rerun (TODO, do not claim either way).
+
+### Section 2 (drift-triggered retraining): done
+- `lifecycle/loop.py` (rule -> retrain -> gate, `simulate_drift`, `stationary_control`), `lifecycle/promotion.py` (moved out of `scripts/promote.py`),
+  `scripts/check_drift_and_retrain.py`, `tests/test_drift_loop.py`, `docs/MODEL_LIFECYCLE.md`, `.github/workflows/drift-check.yml` (not yet run on GitHub).
+- Finding: the raw demo slice is not stationary (sampled around alerted accounts, uneven payment density), so the rule fires on it with no injected
+  drift. The no-drift control therefore shuffles payments in time and spaces timestamps evenly. The control still has 2 of the 3 features needed to fire.
+- Finding: corrupting the evaluation labels as well as the training labels fooled the gate (both models scored ~0.12). Documented as a gate limit;
+  the "broken retrain" scenario corrupts training labels only.
