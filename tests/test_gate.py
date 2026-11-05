@@ -59,3 +59,13 @@ def test_point_in_time_catches_a_leaky_builder():
         return df.with_columns(pl.len().over("src").cast(pl.Float64).alias("s_leak"))
     ok, detail = check_point_in_time(_toy(), ["s_leak"], builder=leaky)
     assert not ok and "s_leak" in detail
+
+
+def test_legacy_pagerank_leaks_future_account_count_and_strict_does_not():
+    """Regression for a real finding: the legacy PageRank sizes snapshots by all accounts, including ones that appear later."""
+    from papertrail.graph_features import add_history_features
+    toy = _toy().with_columns(pl.when(pl.col("txn_id") > 250).then(pl.lit("9_new")).otherwise(pl.col("src")).alias("src"))
+    ok, detail = check_point_in_time(toy, ["s_pagerank", "d_pagerank"], builder=lambda d: add_history_features(d, as_of_nodes=False))
+    assert not ok and "pagerank" in detail
+    ok, detail = check_point_in_time(toy, ["s_pagerank", "d_pagerank"])
+    assert ok, detail

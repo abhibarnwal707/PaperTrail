@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
+from functools import partial
 
 import numpy as np
 import polars as pl
@@ -18,6 +19,7 @@ from papertrail.graph_features import add_history_features
 from papertrail.lifecycle.config import GateTolerances
 
 GATED_METRICS = ("pr_auc", "recall_at_1pct_fpr")
+STRICT_BUILDER = partial(add_history_features, as_of_nodes=True)     # the lifecycle pipeline's feature builder
 
 
 @dataclass(frozen=True)
@@ -58,7 +60,7 @@ def evaluate_gate(candidate: dict[str, float], current: dict[str, float] | None,
 
 
 def check_point_in_time(txns: pl.DataFrame, features: list[str], probe_rows: int = 200, seed: int = 0,
-                        builder: Callable[[pl.DataFrame], pl.DataFrame] = add_history_features) -> tuple[bool, str]:
+                        builder: Callable[[pl.DataFrame], pl.DataFrame] = STRICT_BUILDER) -> tuple[bool, str]:
     """Perturbation test for temporal leakage in the history features.
 
     Rebuild the features on the data truncated at a cut-off time and on the full frame. For every row strictly before the cut-off the

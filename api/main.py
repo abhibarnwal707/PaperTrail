@@ -4,6 +4,8 @@ Self-contained on purpose (no `papertrail` import): it needs only fastapi, pydan
 Docker image small. The model lives in `$PAPERTRAIL_MODEL_DIR` (default data/demo/model) as one or more booster files plus `meta.json`:
     {"feature_names": [...in training order...], "threshold": 0.93, "model": "xgb_v2_final", "files": ["xgb_seed0.json", ...]}
 `files` is optional (default ["xgb.json"]); with several files the probabilities are averaged, as in the evaluated 3-seed ensemble.
+`scripts/export_production.py` writes the registry's production version into such a directory; if `$PAPERTRAIL_MODEL_DIR` cannot be
+loaded the packaged model is used instead.
 Account-level SHAP evidence is read from `$PAPERTRAIL_DEMO_DIR/shap.parquet` (columns: account, feature, value, contribution).
 
 The API scores a transaction from FEATURES the caller supplies. History features (rolling counts, counterparty counts, ...) need an
@@ -83,12 +85,17 @@ def create_app(scorer: Scorer | None = None, demo_dir: Path | None = None) -> Fa
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         if app.state.scorer is None:
-            model_dir = Path(os.environ.get("PAPERTRAIL_MODEL_DIR", app.state.demo_dir / "model"))
-            try:
-                app.state.scorer = Scorer.load(model_dir)
-                log.info("loaded model %s from %s", app.state.scorer.name, model_dir)
-            except Exception as e:  # noqa: BLE001
-                log.warning("no model loaded (%r); /score will return 503", e)
+            packaged = app.state.demo_dir / "model"
+            wanted = Path(os.environ.get("PAPERTRAIL_MODEL_DIR", packaged))      # e.g. the output of scripts/export_production.py
+            for model_dir in dict.fromkeys([wanted, packaged]):                  # fall back to the packaged model if the wanted one fails
+                try:
+                    app.state.scorer = Scorer.load(model_dir)
+                    log.info("loaded model %s from %s", app.state.scorer.name, model_dir)
+                    break
+                except Exception as e:  # noqa: BLE001
+                    log.warning("could not load a model from %s (%r)", model_dir, e)
+            if app.state.scorer is None:
+                log.warning("no model loaded; /score will return 503")
         yield
 
     app = FastAPI(title="PaperTrail scoring API", version="0.1.0", lifespan=lifespan)

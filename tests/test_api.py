@@ -143,3 +143,17 @@ def test_real_xgboost_ensemble_averages_probabilities(tmp_path):
     expect = float(np.mean([b.predict(d)[0] for b in boosters]))
     got = TestClient(create_app(scorer=scorer, demo_dir=tmp_path)).post("/score", json={"features": {"a": 1.5, "b": 0.0}}).json()
     assert got["score"] == pytest.approx(expect, abs=1e-6)
+
+
+def test_broken_model_dir_falls_back_to_the_packaged_model(tmp_path, monkeypatch):
+    import xgboost as xgb
+    packaged = tmp_path / "demo" / "model"
+    packaged.mkdir(parents=True)
+    names = ["f1"]
+    b = xgb.train({"objective": "binary:logistic"}, xgb.DMatrix(np.array([[0.0], [1.0]]), label=[0, 1], feature_names=names), 2)
+    b.save_model(str(packaged / "xgb.json"))
+    (packaged / "meta.json").write_text(json.dumps({"feature_names": names, "threshold": 0.5, "model": "packaged"}))
+    monkeypatch.setenv("PAPERTRAIL_MODEL_DIR", str(tmp_path / "does_not_exist"))
+    with TestClient(create_app(demo_dir=tmp_path / "demo")) as c:
+        assert c.get("/health").json()["model_loaded"] is True
+        assert c.post("/score", json={"features": {"f1": 1.0}}).json()["model"] == "packaged"

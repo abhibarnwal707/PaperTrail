@@ -185,12 +185,17 @@ def pagerank(src_idx, dst_idx, n: int, damping: float = 0.85, iters: int = 50, t
     return r
 
 
-def daily_pagerank(df: pl.DataFrame) -> pl.DataFrame:
+def daily_pagerank(df: pl.DataFrame, as_of_nodes: bool = False) -> pl.DataFrame:
     """Sender/receiver PageRank from a snapshot of all edges before the start of the transaction's day.
 
     PageRank is expensive and not additive over time, so it is recomputed once per day. A transaction on
     day d sees the graph of days < d, never its own day. Day-1 rows get null. Scores are scaled by the number
     of accounts, so 1.0 means "average".
+
+    `as_of_nodes=False` (legacy, used for the published results) sizes every snapshot by ALL accounts in `df`, which includes accounts
+    that only appear later: a small point-in-time leak (the teleport term and the scale depend on future account counts), caught by
+    `lifecycle.gate.check_point_in_time`. `as_of_nodes=True` sizes each snapshot by the accounts seen before that day; accounts not yet
+    seen get null. The lifecycle pipeline uses True.
     """
     _check_sorted(df)
     ids = (pl.concat([df["src"], df["dst"]]).unique().to_frame("acct").with_row_index("id"))
@@ -203,8 +208,16 @@ def daily_pagerank(df: pl.DataFrame) -> pl.DataFrame:
     d_pr = np.full(df.height, np.nan)
     for d in range(2, int(day.max()) + 1):
         before = day < d
-        r = pagerank(s_id[before], d_id[before], n) * n
         now = day == d
+        if as_of_nodes:
+            seen = np.unique(np.concatenate([s_id[before], d_id[before]]))
+            m = len(seen)
+            r = pagerank(np.searchsorted(seen, s_id[before]), np.searchsorted(seen, d_id[before]), m) * m
+            for out, ids in ((s_pr, s_id), (d_pr, d_id)):
+                pos = np.minimum(np.searchsorted(seen, ids[now]), m - 1)
+                out[now] = np.where(seen[pos] == ids[now], r[pos], np.nan)
+            continue
+        r = pagerank(s_id[before], d_id[before], n) * n
         s_pr[now] = r[s_id[now]]
         d_pr[now] = r[d_id[now]]
     return pl.DataFrame({
@@ -214,9 +227,9 @@ def daily_pagerank(df: pl.DataFrame) -> pl.DataFrame:
     })
 
 
-def add_history_features(df: pl.DataFrame, with_pagerank: bool = True) -> pl.DataFrame:
+def add_history_features(df: pl.DataFrame, with_pagerank: bool = True, as_of_nodes: bool = False) -> pl.DataFrame:
     """`df` with all HISTORY_FEATURES appended (same rows, same order). `df` must be sorted by ts."""
     feats = account_features(df).join(reciprocal_flag(df), on="txn_id", how="left")
     if with_pagerank:
-        feats = feats.join(daily_pagerank(df), on="txn_id", how="left")
+        feats = feats.join(daily_pagerank(df, as_of_nodes), on="txn_id", how="left")
     return df.join(feats, on="txn_id", how="left")

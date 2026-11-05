@@ -50,3 +50,18 @@ Order: (1) gate + tests, (2) registry + promote/rollback + tests, (3) API regist
 - Langfuse needs keys I do not have; JSONL is the default sink, Langfuse is wired behind a flag and untested live.
 - Section 4 largely exists (`reports/agent_eval.md`); the missing pieces are guardrail unit tests (check `tests/test_agent.py` first),
   a no-LLM baseline comparison, and cost estimates.
+
+## Progress log
+
+### Section 1 (registry, gate, rollback): done except README/MODEL_LIFECYCLE write-up
+- `lifecycle/{config,gate,registry,model_card,data}.py`, `scripts/{promote,rollback,export_production}.py`, tests in `tests/test_gate.py`, `tests/test_registry.py`.
+- Aliases (`candidate`/`production`/`previous`) instead of MLflow stages (deprecated in MLflow 3).
+- API loads `$PAPERTRAIL_MODEL_DIR` (written by `export_production.py`) and falls back to `data/demo/model`; `mlflow` stays out of the API image.
+- The packaged demo model is NOT registered: its features came from the full Kaggle pipeline and cannot be rebuilt faithfully from the slice,
+  so the registry's first production model is the slice-trained one and the packaged model remains the API fallback.
+
+### Finding: the point-in-time check caught a real (small) leak in `daily_pagerank`
+Each daily PageRank snapshot was sized by ALL accounts in the frame, including accounts that first appear later, so `s_pagerank`/`d_pagerank`
+depended weakly on the future account count. Edges used were always earlier ones. Fix is opt-in (`as_of_nodes=True`) so the published results
+(trained with the legacy behaviour) stay reproducible; the lifecycle pipeline uses the strict version. Whether the legacy leak changes the headline
+metrics is NOT measured: it would need a Kaggle rerun (TODO, do not claim either way).
