@@ -1,0 +1,463 @@
+{
+ "summary": {
+  "cases": 30,
+  "laundering_cases": 24,
+  "clean_cases": 6,
+  "typology_correct": {
+   "agent": 6,
+   "baseline": 5
+  },
+  "typology_named": {
+   "agent": 18,
+   "baseline": 15
+  },
+  "sar_on_laundering": {
+   "agent": 14,
+   "baseline": 12
+  },
+  "sar_on_clean": {
+   "agent": 0,
+   "baseline": 0
+  },
+  "action_agreement": 28,
+  "agent_right_baseline_wrong": [
+   "11056_800E3D880",
+   "21611_808D6F2D0"
+  ],
+  "baseline_right_agent_wrong": [
+   "9371_8043A0FB0"
+  ],
+  "agent_tokens_total": 144597,
+  "agent_tokens_mean": 4819.9,
+  "agent_latency_mean_s": 9.242666666666667,
+  "agent_retries": 2
+ },
+ "cases": [
+  {
+   "account": "50528_812D0C600",
+   "laundering": true,
+   "truth": [
+    "RANDOM",
+    "SCATTER-GATHER",
+    "BIPARTITE"
+   ],
+   "agent_typology": "FAN-IN",
+   "base_typology": "CYCLE",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4323,
+   "agent_latency_s": 2.48,
+   "agent_retried": false
+  },
+  {
+   "account": "148350_812D0C3C0",
+   "laundering": true,
+   "truth": [
+    "BIPARTITE",
+    "SCATTER-GATHER",
+    "RANDOM"
+   ],
+   "agent_typology": "FAN-IN",
+   "base_typology": "CYCLE",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4384,
+   "agent_latency_s": 1.91,
+   "agent_retried": false
+  },
+  {
+   "account": "119_812A09CF0",
+   "laundering": true,
+   "truth": [
+    "STACK",
+    "SCATTER-GATHER",
+    "BIPARTITE",
+    "CYCLE",
+    "RANDOM"
+   ],
+   "agent_typology": "CYCLE",
+   "base_typology": "CYCLE",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4987,
+   "agent_latency_s": 1.51,
+   "agent_retried": false
+  },
+  {
+   "account": "1467_800728800",
+   "laundering": true,
+   "truth": [
+    "CYCLE"
+   ],
+   "agent_typology": "FAN-OUT",
+   "base_typology": "FAN-OUT",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4186,
+   "agent_latency_s": 1.18,
+   "agent_retried": false
+  },
+  {
+   "account": "17854_811AF2F80",
+   "laundering": true,
+   "truth": [
+    "CYCLE"
+   ],
+   "agent_typology": "FAN-IN",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 3117,
+   "agent_latency_s": 0.72,
+   "agent_retried": false
+  },
+  {
+   "account": "49365_812A09D40",
+   "laundering": true,
+   "truth": [
+    "SCATTER-GATHER",
+    "BIPARTITE",
+    "CYCLE",
+    "RANDOM",
+    "STACK"
+   ],
+   "agent_typology": "CYCLE",
+   "base_typology": "CYCLE",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4763,
+   "agent_latency_s": 13.8,
+   "agent_retried": false
+  },
+  {
+   "account": "22164_8014621B0",
+   "laundering": true,
+   "truth": [
+    "FAN-IN"
+   ],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 6679,
+   "agent_latency_s": 11.36,
+   "agent_retried": true
+  },
+  {
+   "account": "11056_800E3D880",
+   "laundering": true,
+   "truth": [
+    "FAN-IN"
+   ],
+   "agent_typology": "FAN-IN",
+   "base_typology": "GATHER-SCATTER",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 5054,
+   "agent_latency_s": 10.11,
+   "agent_retried": false
+  },
+  {
+   "account": "13858_801820540",
+   "laundering": true,
+   "truth": [
+    "FAN-IN"
+   ],
+   "agent_typology": "FAN-OUT",
+   "base_typology": "UNCLEAR",
+   "agent_action": "escalate_SAR",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4262,
+   "agent_latency_s": 15.48,
+   "agent_retried": false
+  },
+  {
+   "account": "48309_811C599A0",
+   "laundering": true,
+   "truth": [
+    "GATHER-SCATTER",
+    "FAN-OUT"
+   ],
+   "agent_typology": "CYCLE",
+   "base_typology": "CYCLE",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4539,
+   "agent_latency_s": 7.58,
+   "agent_retried": false
+  },
+  {
+   "account": "150240_812D22980",
+   "laundering": true,
+   "truth": [
+    "FAN-OUT"
+   ],
+   "agent_typology": "CYCLE",
+   "base_typology": "CYCLE",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4494,
+   "agent_latency_s": 7.31,
+   "agent_retried": false
+  },
+  {
+   "account": "21611_808D6F2D0",
+   "laundering": true,
+   "truth": [
+    "FAN-OUT"
+   ],
+   "agent_typology": "FAN-OUT",
+   "base_typology": "CYCLE",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4770,
+   "agent_latency_s": 7.88,
+   "agent_retried": false
+  },
+  {
+   "account": "222965_80EFDDBB0",
+   "laundering": true,
+   "truth": [
+    "GATHER-SCATTER"
+   ],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4790,
+   "agent_latency_s": 8.73,
+   "agent_retried": false
+  },
+  {
+   "account": "11_800924840",
+   "laundering": true,
+   "truth": [
+    "GATHER-SCATTER"
+   ],
+   "agent_typology": "GATHER-SCATTER",
+   "base_typology": "GATHER-SCATTER",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4969,
+   "agent_latency_s": 11.22,
+   "agent_retried": false
+  },
+  {
+   "account": "9371_8043A0FB0",
+   "laundering": true,
+   "truth": [
+    "GATHER-SCATTER"
+   ],
+   "agent_typology": "FAN-OUT",
+   "base_typology": "GATHER-SCATTER",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 5107,
+   "agent_latency_s": 11.93,
+   "agent_retried": false
+  },
+  {
+   "account": "15010_80362C640",
+   "laundering": true,
+   "truth": [
+    "RANDOM"
+   ],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 5015,
+   "agent_latency_s": 11.49,
+   "agent_retried": false
+  },
+  {
+   "account": "9665_804234190",
+   "laundering": true,
+   "truth": [
+    "RANDOM"
+   ],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4779,
+   "agent_latency_s": 7.66,
+   "agent_retried": false
+  },
+  {
+   "account": "23691_8021353D0",
+   "laundering": true,
+   "truth": [
+    "CYCLE",
+    "SCATTER-GATHER",
+    "GATHER-SCATTER",
+    "BIPARTITE",
+    "FAN-IN",
+    "RANDOM"
+   ],
+   "agent_typology": "CYCLE",
+   "base_typology": "CYCLE",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4753,
+   "agent_latency_s": 9.99,
+   "agent_retried": false
+  },
+  {
+   "account": "222697_8087F4940",
+   "laundering": true,
+   "truth": [
+    "SCATTER-GATHER"
+   ],
+   "agent_typology": "FAN-IN",
+   "base_typology": "FAN-IN",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 5246,
+   "agent_latency_s": 15.87,
+   "agent_retried": false
+  },
+  {
+   "account": "15085_81121FAB0",
+   "laundering": true,
+   "truth": [
+    "SCATTER-GATHER"
+   ],
+   "agent_typology": "FAN-IN",
+   "base_typology": "FAN-IN",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4832,
+   "agent_latency_s": 10.56,
+   "agent_retried": false
+  },
+  {
+   "account": "220_800118660",
+   "laundering": true,
+   "truth": [
+    "SCATTER-GATHER"
+   ],
+   "agent_typology": "CYCLE",
+   "base_typology": "CYCLE",
+   "agent_action": "escalate_SAR",
+   "base_action": "escalate_SAR",
+   "agent_tokens": 4684,
+   "agent_latency_s": 8.22,
+   "agent_retried": false
+  },
+  {
+   "account": "11_8006345A0",
+   "laundering": true,
+   "truth": [
+    "STACK"
+   ],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 3638,
+   "agent_latency_s": 9.8,
+   "agent_retried": false
+  },
+  {
+   "account": "11974_800FC2A60",
+   "laundering": true,
+   "truth": [
+    "STACK"
+   ],
+   "agent_typology": "FAN-OUT",
+   "base_typology": "UNCLEAR",
+   "agent_action": "escalate_SAR",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4720,
+   "agent_latency_s": 9.04,
+   "agent_retried": false
+  },
+  {
+   "account": "24515_80254C330",
+   "laundering": true,
+   "truth": [
+    "STACK"
+   ],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 5072,
+   "agent_latency_s": 11.85,
+   "agent_retried": false
+  },
+  {
+   "account": "312002_805B959D0",
+   "laundering": false,
+   "truth": [],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 3978,
+   "agent_latency_s": 11.73,
+   "agent_retried": false
+  },
+  {
+   "account": "16_8058AF4B0",
+   "laundering": false,
+   "truth": [],
+   "agent_typology": "FAN-IN",
+   "base_typology": "FAN-IN",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4469,
+   "agent_latency_s": 11.33,
+   "agent_retried": false
+  },
+  {
+   "account": "10_80012FD40",
+   "laundering": false,
+   "truth": [],
+   "agent_typology": "FAN-IN",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 5250,
+   "agent_latency_s": 13.73,
+   "agent_retried": false
+  },
+  {
+   "account": "331557_810B45D20",
+   "laundering": false,
+   "truth": [],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4052,
+   "agent_latency_s": 12.92,
+   "agent_retried": false
+  },
+  {
+   "account": "2845_810B45BE0",
+   "laundering": false,
+   "truth": [],
+   "agent_typology": "FAN-IN",
+   "base_typology": "FAN-IN",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 9120,
+   "agent_latency_s": 11.02,
+   "agent_retried": true
+  },
+  {
+   "account": "11974_8057E3520",
+   "laundering": false,
+   "truth": [],
+   "agent_typology": "UNCLEAR",
+   "base_typology": "UNCLEAR",
+   "agent_action": "enhanced_review",
+   "base_action": "enhanced_review",
+   "agent_tokens": 4565,
+   "agent_latency_s": 8.87,
+   "agent_retried": false
+  }
+ ]
+}

@@ -79,3 +79,10 @@ metrics is NOT measured: it would need a Kaggle rerun (TODO, do not claim either
   guardrail rejections), `PROMPT_VERSION` in `agent/prompts.py`, `scripts/replay.py`, `tests/test_tracing.py`, `tests/conftest.py` (shared `toolbox` fixture), `docs/AGENT_OBSERVABILITY.md`.
 - Decision: JSONL sink only; Langfuse/OTel exporter not built (could not test without keys). Plan item "Langfuse or OpenTelemetry" is therefore only partly met.
 - Section 4 status: guardrail unit tests already exist in `tests/test_agent.py`; 30-case eval exists in `reports/agent_eval.md`. Still missing: a no-LLM baseline comparison and cost estimates.
+
+### Section 4 (agent evaluation): done; and wrap-up
+- `agent/baseline.py` (rule typology with a-priori thresholds, the prompt's escalation policy in code, template summary that passes the guardrail), `scripts/agent_baseline.py`, `reports/agent_vs_baseline.{md,json}`, `tests/test_baseline.py`.
+- Result: typology 6/24 (agent) vs 5/24 (baseline), same action on 28/30, 0 vs 0 false escalations; agent costs ~4,820 tokens and 9.2 s per case. Conclusion in the report: no measurable gain on these cases; the narrative is unscored.
+- README section 8.1 and `RESULTS_SUMMARY.md` written. Every number in them comes from a script or report above.
+- Open TODOs: Kaggle rerun to see if the legacy PageRank leak moved headline metrics; Langfuse/OTel exporter; retirement observation period; a live-LLM trace.
+- Unexplained: twice, a shell `for` loop running the poisoned-label scenario printed no output; run directly it works (exit 0). Not investigated further.

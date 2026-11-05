@@ -140,6 +140,17 @@ Models are free-tier: a curated, tested list (Groq `gpt-oss-120b`, `qwen3.8-27b`
 - **Scoring API** (`api/`, FastAPI + Docker): `POST /score` (3-booster ensemble) and `GET /explain/{account}`. Latency with the real model, in-process: **p50 1.6 ms, p95 2.1 ms, p99 2.4 ms** ([`reports/latency.md`](reports/latency.md)). CI runs ruff, pytest and the Docker build on every push.
 - **Drift** ([report](https://abhibarnwal707.github.io/PaperTrail/), `src/papertrail/drift.py`): PSI against the training window (Sep 2–6). Payment details and 24-hour behaviour are stable on the test window (25 of 26 features below 0.1), and the models' scores barely move (PSI 0.05–0.07). Features built on 7-day windows or all-time totals drift strongly, but only because the data starts on Sep 1 and those windows fill up during the period (they jump on Sep 8–9, exactly when 7-day windows first fill), so they are reported and excluded from the trigger. **Retraining trigger: PSI > 0.2 on 3 or more of the 15 most important calendar-stable features**, checked daily; on the test window it fires on none. With 10 days of synthetic data this shows that the mechanism works, not how real drift would look.
 
+### 8.1 Model lifecycle and agent observability
+
+Added on top of the drift monitor: an MLflow registry, an evaluation gate, rollback, a drift-triggered retrain loop, and tracing with replay for the investigator. Full detail in [`docs/MODEL_LIFECYCLE.md`](docs/MODEL_LIFECYCLE.md) and [`docs/AGENT_OBSERVABILITY.md`](docs/AGENT_OBSERVABILITY.md); every measured result with its command is in [`RESULTS_SUMMARY.md`](RESULTS_SUMMARY.md).
+
+- **Registry and gate.** `scripts/promote.py` registers a candidate (data hash, git SHA, feature-list hash, metrics) and promotes it only if PR-AUC and recall at 1% FPR are within a tolerance of production and a point-in-time leakage check passes. `scripts/rollback.py` restores the previous version. The API can serve the exported registry model and falls back to the packaged one.
+- **Drift to retrain to gate.** `scripts/check_drift_and_retrain.py` evaluates the PSI rule and, when it fires, retrains and gates the result; each decision is an MLflow run. A simulated-drift test shows all three outcomes (no drift, retrain promoted, retrain rejected).
+- **The leakage check found a real leak.** Each PageRank snapshot was sized by all accounts in the data, including ones that appear later. The fix is opt-in (`as_of_nodes=True`) so the published results stay reproducible; whether the leak moved the headline metrics has not been measured (needs a Kaggle rerun).
+- **Tracing and replay.** `PAPERTRAIL_TRACING=jsonl` records every step, tool call, LLM call and guardrail rejection; `scripts/replay.py <run_id>` reproduces a run from the recording without data or an LLM key. Langfuse/OpenTelemetry export is not implemented.
+- **Agent vs a no-LLM baseline** ([`reports/agent_vs_baseline.md`](reports/agent_vs_baseline.md)). On the same 30 cases the baseline gets 5 of 24 typologies right and the agent 6, and they take the same action on 28 of 30. The agent costs about 4,800 tokens and 9 s per case; its measurable gain on these cases is within noise, and the narrative is the part no metric scores.
+- **Scope.** The lifecycle code runs on the ~8k-row demo slice (about 12% laundering), so its metrics demonstrate the mechanism, not model quality. The headline numbers above are unchanged.
+
 ## 9. Design decisions and trade-offs
 
 - **Score-level blend instead of one joint model.** Each model stays simple and separately evaluated, the weight is one number chosen on validation, and the app can show each model's own evidence (feature drivers for XGBoost, the network for the GNN).
@@ -166,7 +177,7 @@ Models are free-tier: a curated, tested list (Groq `gpt-oss-120b`, `qwen3.8-27b`
 ```bash
 git clone https://github.com/abhibarnwal707/PaperTrail.git && cd PaperTrail
 pip install -e ".[dev,api,app,agent]"
-pytest && ruff check                      # 145+ tests; the demo bundle is in the repo
+pytest && ruff check                      # 190+ tests; the demo bundle is in the repo
 streamlit run app/streamlit_app.py        # the console on the committed demo bundle
 uvicorn api.main:app --port 8000          # the scoring API (or: docker build -f api/Dockerfile .)
 ```
